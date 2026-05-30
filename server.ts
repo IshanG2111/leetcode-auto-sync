@@ -263,13 +263,15 @@ async function startServer() {
 
         // Notion
         if (notion) {
+          let tags: any[] = [];
+          let properties: any = {};
           try {
             log(`[Notion] Creating entry for ${sub.title}...`);
             
             // Format tags
-            const tags = (details.topicTags || []).map((t: any) => ({ name: t.name }));
+            tags = (details.topicTags || []).map((t: any) => ({ name: t.name }));
 
-            const properties: any = {
+            properties = {
                 'Name': {
                   title: [ { text: { content: sub.title } } ]
                 },
