@@ -1,0 +1,6 @@
+{
+  "name": "LeetCode Auto-Sync",
+  "description": "Sync LeetCode solves to Notion and GitHub automatically",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
