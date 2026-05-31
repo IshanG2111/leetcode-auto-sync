@@ -28,7 +28,7 @@
   --border-neumorphic: 1px solid rgba(255, 255, 255, 0.015);
 
   /* iOS System Palette */
-  --accent-blue: #0A84FF;
+  --accent-blue: #FF5A00;
   --accent-indigo: #5E5CE6;
   --accent-purple: #BF5AF2;
   --accent-green: #30D158;
@@ -47,12 +47,12 @@
   /* Borders */
   --border-glass: rgba(255, 255, 255, 0.08);
   --border-bright: rgba(255, 255, 255, 0.14);
-  --border-focus: rgba(10, 132, 255, 0.55);
+  --border-focus: rgba(255, 90, 0, 0.55);
 
   /* Shadows */
   --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255,255,255,0.06) inset;
   --shadow-elevated: 0 16px 56px rgba(0, 0, 0, 0.65);
-  --shadow-glow-blue: 0 4px 24px rgba(10, 132, 255, 0.18);
+  --shadow-glow-blue: 0 4px 24px rgba(255, 90, 0, 0.18);
   --shadow-glow-indigo: 0 4px 24px rgba(94, 92, 230, 0.14);
   --shadow-glow-green: 0 4px 24px rgba(48, 209, 88, 0.14);
 
@@ -110,7 +110,7 @@
   --border-neumorphic: 1px solid rgba(255, 255, 255, 0.3);
 
   /* iOS Light Accents */
-  --accent-blue: #0071e3;
+  --accent-blue: #FF5A00;
   --accent-indigo: #5e5ce6;
   --accent-purple: #af52de;
   --accent-green: #24b14d;
@@ -129,12 +129,12 @@
   /* Borders */
   --border-glass: rgba(0, 0, 0, 0.06);
   --border-bright: rgba(0, 0, 0, 0.12);
-  --border-focus: rgba(0, 113, 227, 0.55);
+  --border-focus: rgba(255, 90, 0, 0.55);
 
   /* Shadows */
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08) inset;
   --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.08);
-  --shadow-glow-blue: 0 4px 24px rgba(0, 113, 227, 0.1);
+  --shadow-glow-blue: 0 4px 24px rgba(255, 90, 0, 0.15);
   --shadow-glow-indigo: 0 4px 24px rgba(94, 92, 230, 0.08);
   --shadow-glow-green: 0 4px 24px rgba(36, 177, 77, 0.08);
 }
@@ -205,7 +205,7 @@ body {
 .ambient-bg .orb-2 {
   width: 550px; height: 550px;
   bottom: -150px; left: -120px;
-  background: radial-gradient(circle, rgba(10, 132, 255, 0.05) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255, 90, 0, 0.05) 0%, transparent 65%);
   animation: orbFloat 16s ease-in-out infinite reverse;
 }
 
@@ -239,7 +239,7 @@ body {
 }
 
 .glass:hover {
-  border-color: rgba(255, 159, 252, 0.15); /* Soft scan pink halo */
+  border-color: rgba(255, 90, 0, 0.15); /* Soft scan orange halo */
   box-shadow: 
     12px 12px 24px var(--shadow-dark), 
     -12px -12px 24px var(--shadow-light);
@@ -308,9 +308,12 @@ body {
 .seg-btn:hover { color: var(--text-1); }
 
 .seg-btn.active {
-  color: var(--text-1);
-  background: var(--bg-card);
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  color: #ffffff !important;
+  background: var(--accent-blue) !important;
+  box-shadow: 0 4px 12px rgba(255, 90, 0, 0.22), 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+}
+.seg-btn.active:hover {
+  color: #ffffff !important;
 }
 
 /* ─────────── Buttons ─────────── */
@@ -339,14 +342,14 @@ body {
 .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
 .btn-primary {
-  background: linear-gradient(180deg, #1fa2ff 0%, var(--accent-blue) 100%);
+  background: #FF5A00;
   color: #fff;
   border: var(--border-neumorphic);
-  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.25), 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  box-shadow: 0 4px 14px rgba(255, 90, 0, 0.25), 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
 }
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #33abff 0%, #1579e0 100%);
-  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.35), 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+  background: #e04f00;
+  box-shadow: 0 6px 18px rgba(255, 90, 0, 0.35), 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
   transform: translateY(-1px);
 }
 
@@ -414,8 +417,8 @@ body {
   border-color: var(--accent-blue);
   background: var(--bg-input);
   box-shadow: 
-    0 0 0 3px rgba(10, 132, 255, 0.15), 
-    0 0 0 1px rgba(10, 132, 255, 0.4),
+    0 0 0 3px rgba(255, 90, 0, 0.15), 
+    0 0 0 1px rgba(255, 90, 0, 0.4),
     inset 4px 4px 8px var(--shadow-inset-dark), inset -4px -4px 8px var(--shadow-inset-light);
 }
 
@@ -489,9 +492,9 @@ body {
 }
 
 .badge-active {
-  background: rgba(10, 132, 255, 0.1);
+  background: rgba(255, 90, 0, 0.1);
   color: var(--accent-blue);
-  border: 1px solid rgba(10, 132, 255, 0.15);
+  border: 1px solid rgba(255, 90, 0, 0.15);
 }
 
 .badge-indigo {
@@ -530,7 +533,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-indigo));
+  background: var(--accent-blue);
   border-radius: var(--r-pill);
   transition: width 0.7s var(--ease-spring);
 }
@@ -596,9 +599,9 @@ body {
 }
 
 .bubble-user {
-  background: linear-gradient(135deg, rgba(10, 132, 255, 0.22), rgba(94, 92, 230, 0.18));
+  background: linear-gradient(135deg, rgba(255, 90, 0, 0.22), rgba(255, 140, 0, 0.15));
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(10, 132, 255, 0.15);
+  border: 1px solid rgba(255, 90, 0, 0.2);
   border-radius: 22px 22px 6px 22px;
   padding: 0.9rem 1.15rem;
   color: #fff;
@@ -608,9 +611,9 @@ body {
 }
 
 .chip {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 90, 0, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 90, 0, 0.15);
   padding: 0.45rem 0.9rem;
   border-radius: var(--r-pill);
   font-size: 0.85rem;
@@ -621,8 +624,8 @@ body {
 }
 
 .chip:hover {
-  background: rgba(10, 132, 255, 0.1);
-  border-color: rgba(10, 132, 255, 0.2);
+  background: rgba(255, 90, 0, 0.12);
+  border-color: rgba(255, 90, 0, 0.25);
   transform: translateY(-1px);
 }
 
@@ -724,7 +727,7 @@ body {
   opacity: 0.85;
 }
 .help-link:hover {
-  color: #3da2ff;
+  color: #ff8c00;
   opacity: 1;
 }
 
@@ -769,7 +772,7 @@ body {
   background: radial-gradient(circle, rgba(94, 92, 230, 0.08) 0%, transparent 65%);
 }
 .light .ambient-bg .orb-2 {
-  background: radial-gradient(circle, rgba(10, 132, 255, 0.07) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255, 90, 0, 0.07) 0%, transparent 65%);
 }
 .light .ambient-bg .orb-3 {
   background: radial-gradient(circle, rgba(255, 55, 95, 0.04) 0%, transparent 65%);
@@ -792,13 +795,13 @@ body {
 }
 
 .light .glass:hover {
-  border-color: rgba(94, 92, 230, 0.22);
-  border-top-color: rgba(94, 92, 230, 0.35);
-  border-left-color: rgba(94, 92, 230, 0.25);
+  border-color: rgba(255, 90, 0, 0.22);
+  border-top-color: rgba(255, 90, 0, 0.35);
+  border-left-color: rgba(255, 90, 0, 0.25);
   box-shadow: 
-    0 1px 0 0 rgba(94, 92, 230, 0.1) inset,
+    0 1px 0 0 rgba(255, 90, 0, 0.1) inset,
     0 12px 40px 0 rgba(0, 0, 0, 0.06),
-    0 0 24px 0 rgba(94, 92, 230, 0.03);
+    0 0 24px 0 rgba(255, 90, 0, 0.03);
 }
 
 .light .glass-solid {
@@ -827,8 +830,8 @@ body {
   border-color: var(--accent-blue);
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 0 0 3px rgba(0, 113, 227, 0.15), 
-    0 0 0 1px rgba(0, 113, 227, 0.4),
+    0 0 0 3px rgba(255, 90, 0, 0.15), 
+    0 0 0 1px rgba(255, 90, 0, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.05) inset;
 }
 
@@ -856,19 +859,19 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 .light .bubble-user {
-  background: linear-gradient(135deg, rgba(10, 132, 227, 0.1), rgba(94, 92, 230, 0.06));
-  border-color: rgba(10, 132, 227, 0.1);
+  background: linear-gradient(135deg, rgba(255, 90, 0, 0.12), rgba(255, 140, 0, 0.06));
+  border-color: rgba(255, 90, 0, 0.15);
   color: var(--text-1);
 }
 .light .chip {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 90, 0, 0.05);
+  border-color: rgba(255, 90, 0, 0.15);
   color: var(--accent-blue);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 .light .chip:hover {
-  background: rgba(0, 113, 227, 0.05);
-  border-color: rgba(0, 113, 227, 0.15);
+  background: rgba(255, 90, 0, 0.06);
+  border-color: rgba(255, 90, 0, 0.18);
 }
 
 .light .code-panel {
@@ -966,7 +969,7 @@ body {
   position: absolute;
   inset: -1.5px;
   border-radius: inherit;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+  background: var(--accent-blue);
   z-index: -1;
   opacity: 0;
   transition: opacity 0.4s ease;

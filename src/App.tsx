@@ -529,7 +529,7 @@ export default function App() {
               <ol className="space-y-4">
                 {helpGuides[helpModal].steps.map((s, i) => (
                   <li key={i} className="flex gap-3.5 items-start">
-                    <span className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(10,132,255,0.1)', color: 'var(--accent-blue)' }}>{i + 1}</span>
+                    <span className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(255, 90, 0, 0.1)', color: 'var(--accent-blue)' }}>{i + 1}</span>
                     <span className="text-[0.92rem] leading-relaxed pt-0.5" style={{ color: 'var(--text-2)' }}>{s}</span>
                   </li>
                 ))}
@@ -613,7 +613,7 @@ export default function App() {
             {/* WebGL Scanner Background */}
             <GridScan 
               linesColor="#2f293a" 
-              scanColor="#ff9ffc" 
+              scanColor="#ff5a00" 
               scanOpacity={0.28} 
               gridScale={0.12} 
               lineThickness={1.25}
@@ -659,7 +659,7 @@ export default function App() {
               >
                 <BlurText
                   text="THE PREMIER LEETCODE AUTOMATION ENGINE"
-                  className="text-xs md:text-sm font-semibold tracking-[0.3em] text-[#FF9FFC] opacity-80"
+                  className="text-xs md:text-sm font-semibold tracking-[0.3em] text-[#FF5A00] opacity-80"
                   delay={45}
                   animateBy="letters"
                   direction="bottom"
@@ -693,7 +693,7 @@ export default function App() {
             <header className="sticky top-0 z-50 w-full glass-nav">
               <div className="max-w-[1120px] mx-auto px-5 py-3.5 flex items-center justify-between gap-4">
                 <div className="flex items-center">
-                  <h1 className="font-orbitron font-extrabold text-[1.25rem] tracking-[0.25em] text-[#FF9FFC] select-none leading-none pt-0.5">
+                  <h1 className="font-orbitron font-extrabold text-[1.25rem] tracking-[0.25em] text-[#FF5A00] select-none leading-none pt-0.5">
                     AERGIA
                   </h1>
                 </div>
@@ -703,7 +703,7 @@ export default function App() {
                     {(['dashboard', 'settings', 'assistant', 'about'] as const).map(t => (
                       <button key={t} onClick={() => setActiveTab(t)} className={`seg-btn ${activeTab === t ? 'active' : ''}`}>
                         {t === 'dashboard' ? 'Dashboard' : t === 'settings' ? 'Settings' : t === 'assistant' ? 'Setup' : 'About'}
-                        {t === 'assistant' && !leetcodeUsername && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-500 rounded-full animate-ping" />}
+                        {t === 'assistant' && !leetcodeUsername && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#FF5A00] rounded-full animate-ping" />}
                       </button>
                     ))}
                   </div>
@@ -739,7 +739,7 @@ export default function App() {
                               href={`https://leetcode.com/u/${leetcodeUsername}`} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="font-bold text-[#FF9FFC] hover:text-[#0A84FF] transition-colors duration-300 border-b border-[#FF9FFC]/30 hover:border-[#0A84FF]/30 pb-0.5 flex items-center gap-1"
+                              className="font-bold text-[#FF5A00] hover:text-[#0A84FF] transition-colors duration-300 border-b border-[#FF5A00]/30 hover:border-[#0A84FF]/30 pb-0.5 flex items-center gap-1"
                             >
                               @{leetcodeUsername}
                               <ExternalLink className="w-3.5 h-3.5 opacity-60" />
@@ -760,7 +760,7 @@ export default function App() {
                             <h3 className="text-xl font-bold tracking-tight">Sync Flow</h3>
                           </div>
                           <div className={`badge ${isSyncing ? 'badge-active' : 'badge-idle'}`}>
-                            <span className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-blue-500 animate-pulse' : 'bg-white/15'}`} />
+                            <span className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-[#FF5A00] animate-pulse' : 'bg-white/15'}`} />
                             {isSyncing ? 'Syncing…' : 'Idle'}
                           </div>
                         </div>
@@ -772,7 +772,7 @@ export default function App() {
                             <defs>
                               <linearGradient id="active-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stopColor="var(--accent-orange)" />
-                                <stop offset="50%" stopColor="var(--accent-blue)" />
+                                <stop offset="50%" stopColor="#FF5A00" />
                                 <stop offset="100%" stopColor="var(--accent-green)" />
                               </linearGradient>
                             </defs>
@@ -854,7 +854,7 @@ export default function App() {
                             title={isSyncing ? 'Processing Data Pipeline' : 'Aergia Engine Ready'}
                           >
                             <span className={`led-dot ${leetcodeUsername ? (isSyncing ? 'led-syncing animate-ping' : 'led-active') : 'led-inactive'}`} />
-                            <div className={`icon-box w-9 h-9 md:w-10 md:h-10 ${isSyncing ? 'animate-pulse' : ''}`} style={{ background: leetcodeUsername ? 'rgba(10,132,255,0.08)' : 'var(--bg-inactive)', color: leetcodeUsername ? '#0A84FF' : 'var(--color-inactive)', borderRadius: '12px' }}>
+                            <div className={`icon-box w-9 h-9 md:w-10 md:h-10 ${isSyncing ? 'animate-pulse' : ''}`} style={{ background: leetcodeUsername ? 'rgba(255,90,0,0.08)' : 'var(--bg-inactive)', color: leetcodeUsername ? '#FF5A00' : 'var(--color-inactive)', borderRadius: '12px' }}>
                               <Cpu className={`w-5 h-5 md:w-5.5 md:h-5.5 ${isSyncing ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }} />
                             </div>
                             <div className="flex flex-col items-center md:items-start text-center md:text-left">
@@ -962,18 +962,18 @@ export default function App() {
                                     <tbody>
                                       {/* Syncing active row */}
                                       {isSyncing && (
-                                        <tr className="animate-pulse border-b border-white/[0.02]" style={{ background: 'rgba(10,132,255,0.02)' }}>
+                                        <tr className="animate-pulse border-b border-white/[0.02]" style={{ background: 'rgba(255, 90, 0, 0.02)' }}>
                                           <td className="py-2.5 px-2.5">
                                             <div className="flex items-center gap-2">
-                                              <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
-                                              <span className="text-[0.68rem] font-bold italic text-blue-400">Syncing active solve...</span>
+                                              <RefreshCw className="w-3.5 h-3.5 text-[#FF5A00] animate-spin" />
+                                              <span className="text-[0.68rem] font-bold italic text-[#FF5A00]">Syncing active solve...</span>
                                             </div>
                                           </td>
                                           <td className="py-2.5 px-2.5 text-center">
                                             <div className="inline-flex gap-1 justify-center items-center">
                                               {syncToGithub && <span className="w-1.5 h-1.5 rounded-full bg-green-400/60 animate-ping" />}
                                               {syncToNotion && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60 animate-ping" />}
-                                              {!syncToGithub && !syncToNotion && <span className="w-1.5 h-1.5 rounded-full bg-blue-400/60 animate-ping" />}
+                                              {!syncToGithub && !syncToNotion && <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A00]/60 animate-ping" />}
                                             </div>
                                           </td>
                                           <td className="py-2.5 px-2.5 text-right text-[0.68rem]" style={{ color: 'var(--text-3)' }}>Pending...</td>
@@ -985,7 +985,7 @@ export default function App() {
                                           <td className="py-2.5 px-2.5 min-w-[120px] max-w-[200px]">
                                             <div className="flex items-center gap-2 min-w-0">
                                               <div className="flex items-center justify-center shrink-0 w-6 h-6 rounded bg-white/5 border border-white/5" style={{ color: 'var(--text-2)' }}>
-                                                <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                                                <Code2 className="w-3.5 h-3.5 text-[#FF5A00]" />
                                               </div>
                                               <span className="text-xs font-bold text-white truncate" style={{ color: 'var(--text-1)' }}>{s.title}</span>
                                             </div>
@@ -1248,7 +1248,7 @@ export default function App() {
                         {/* Chat */}
                         <div className="lg:col-span-3 flex flex-col h-[520px] chat-panel">
                           <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: 'rgba(22,22,24,0.8)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                            <div className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 bg-blue-500 rounded-full anim-pulse" /><span className="text-sm font-bold" style={{ color: 'var(--text-2)' }}>Setup Assistant</span></div>
+                            <div className="flex items-center gap-2.5"><div className="w-2.5 h-2.5 bg-[#FF5A00] rounded-full anim-pulse" /><span className="text-sm font-bold" style={{ color: 'var(--text-2)' }}>Setup Assistant</span></div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-3)' }}><Lock className="w-3 h-3 text-green-400" />Local Only</div>
                           </div>
                           <div className="flex-1 overflow-y-auto p-5 space-y-4" style={{ background: 'rgba(0,0,0,0.12)' }}>
@@ -1294,7 +1294,7 @@ export default function App() {
                             </div>
                           </div>
                           <div className="space-y-2.5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                            <div className="flex justify-between items-center"><span className="text-sm font-semibold" style={{ color: 'var(--text-3)' }}>Completion</span><span className="text-sm font-bold text-blue-400">{pct()}%</span></div>
+                            <div className="flex justify-between items-center"><span className="text-sm font-semibold" style={{ color: 'var(--text-3)' }}>Completion</span><span className="text-sm font-bold text-[#FF5A00]">{pct()}%</span></div>
                             <div className="progress-track"><div className="progress-fill" style={{ width: `${pct()}%` }} /></div>
                           </div>
                         </div>
@@ -1322,13 +1322,12 @@ export default function App() {
                           
                           {/* Image Wrapper */}
                           <div className="relative group shrink-0 w-48 h-48 md:w-56 md:h-56">
-                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#FF9FFC] to-[#0A84FF] opacity-15 group-hover:opacity-35 blur-xl transition-all duration-500" />
-                            <div className="relative w-full h-full rounded-3xl bg-gradient-to-tr from-[#FF9FFC] to-[#0A84FF] p-[1.5px] shadow-2xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#FF5A00] to-[#FF9F0A] opacity-15 group-hover:opacity-35 blur-xl transition-all duration-500" />
+                            <div className="relative w-full h-full rounded-3xl bg-gradient-to-tr from-[#FF5A00] to-[#FF9F0A] p-[1.5px] shadow-2xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
                               <img 
                                 src={profileImg} 
-                                alt="Ishan Ghosh Halftone Portrait" 
-                                className="w-full h-full object-cover rounded-[22px] grayscale contrast-125"
-                                style={{ mixBlendMode: 'luminosity' }}
+                                alt="Ishan Ghosh Portrait" 
+                                className="w-full h-full object-cover rounded-[22px]"
                               />
                             </div>
                           </div>
@@ -1349,7 +1348,7 @@ export default function App() {
                               username="@ishan-ghosh-7b33a4336"
                               avatarText="IG"
                               iconPath="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"
-                              colorTheme="#0A84FF"
+                              colorTheme="#FF5A00"
                             />
                             
                             <Tooltip 
@@ -1360,7 +1359,7 @@ export default function App() {
                               avatarText="IG"
                               iconPath="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
                               viewBox="0 0 16 16"
-                              colorTheme="#FF9FFC"
+                              colorTheme="#FF5A00"
                             />
                           </div>
 
@@ -1371,7 +1370,7 @@ export default function App() {
                           
                           {/* Architect Statement */}
                           <motion.div variants={cardVariant} className="glass">
-                            <h4 className="text-sm font-black uppercase tracking-[0.15em] mb-2 text-[#FF9FFC]">Philosophy</h4>
+                            <h4 className="text-sm font-black uppercase tracking-[0.15em] mb-2 text-[#FF5A00]">Philosophy</h4>
                             <p className="text-[0.95rem] leading-relaxed text-white/70" style={{ color: 'var(--text-2)' }}>
                               "Aergia was designed out of a need for clean, reliable, and zero-compromise developer productivity. Every element in its layout, visual timeline, and local schema is built with state-of-the-art web tokens to bring a beautiful, premium console directly to your browser."
                             </p>
@@ -1379,7 +1378,7 @@ export default function App() {
 
                           {/* How it Works Section */}
                           <motion.div variants={cardVariant} className="glass space-y-4">
-                            <h4 className="text-sm font-black uppercase tracking-[0.15em] text-[#0A84FF]">System Architecture</h4>
+                            <h4 className="text-sm font-black uppercase tracking-[0.15em] text-[#FF5A00]">System Architecture</h4>
                             
                             <div className="space-y-4 pt-2">
                               {/* 1. Sync engine */}
@@ -1406,7 +1405,7 @@ export default function App() {
 
                               {/* 3. GitHub repository */}
                               <div className="flex gap-3.5 items-start">
-                                <div className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border border-blue-500/30 text-blue-400 bg-blue-500/5">3</div>
+                                <div className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border border-[#FF5A00]/30 text-[#FF5A00] bg-[#FF5A00]/5">3</div>
                                 <div>
                                   <h5 className="text-xs font-bold uppercase tracking-wider text-white" style={{ color: 'var(--text-1)' }}>GitHub Automations</h5>
                                   <p className="text-xs leading-relaxed text-white/50 mt-0.5" style={{ color: 'var(--text-3)' }}>
