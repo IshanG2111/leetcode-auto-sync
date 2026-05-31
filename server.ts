@@ -510,6 +510,68 @@ async function startServer() {
     }
   });
 
+  app.get('/api/leetcode-profile/:username', async (req, res) => {
+    const { username } = req.params;
+    const PROFILE_QUERY = `query userProblemsSolved($username: String!) {
+      allQuestionsCount {
+        difficulty
+        count
+      }
+      matchedUser(username: $username) {
+        submitStats {
+          acSubmissionNum {
+            difficulty
+            count
+            submissions
+          }
+        }
+      }
+    }`;
+    try {
+      const data = await fetchLeetCode(PROFILE_QUERY, { username });
+      if (!data.data || !data.data.matchedUser) {
+        return res.status(404).json({ error: 'LeetCode user not found or is inactive.' });
+      }
+      res.json(data.data);
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post('/api/test-notion', async (req, res) => {
+    const { notionToken, notionDbId } = req.body;
+    if (!notionToken || !notionDbId) {
+      return res.status(400).json({ error: 'Missing token or database ID.' });
+    }
+    try {
+      const notion = new NotionClient({ auth: notionToken });
+      await notion.databases.retrieve({ database_id: notionDbId });
+      res.json({ success: true, message: 'Successfully connected to Notion!' });
+    } catch (e: any) {
+      res.status(400).json({ error: e.message || 'Failed to authenticate with Notion' });
+    }
+  });
+
+  app.post('/api/test-github', async (req, res) => {
+    const { githubToken, githubRepo } = req.body;
+    if (!githubToken || !githubRepo) {
+      return res.status(400).json({ error: 'Missing GitHub token or repository name.' });
+    }
+    try {
+      const octokit = new Octokit({ auth: githubToken });
+      const parts = githubRepo.split('/');
+      if (parts.length !== 2) {
+        return res.status(400).json({ error: 'Invalid repository name. Format must be owner/repo.' });
+      }
+      const [owner, repo] = parts;
+      await octokit.repos.get({ owner, repo });
+      res.json({ success: true, message: 'Successfully connected to GitHub repository!' });
+    } catch (e: any) {
+      res.status(400).json({ error: e.message || 'Failed to connect to GitHub repository.' });
+    }
+  });
+
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
