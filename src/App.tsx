@@ -34,16 +34,16 @@ interface SolvedItem {
 /* ─── Motion Presets ─── */
 const spring = { type: "spring" as const, stiffness: 280, damping: 28 };
 const pageVariants = {
-  initial: { opacity: 0, y: 24, scale: 0.98 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -16, scale: 0.98 },
+  initial: { opacity: 0, y: 24, scale: 0.98, filter: 'blur(6px)' },
+  animate: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' },
+  exit: { opacity: 0, y: -16, scale: 0.98, filter: 'blur(4px)' },
 };
 const stagger = {
   animate: { transition: { staggerChildren: 0.06 } },
 };
 const cardVariant = {
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0, transition: spring },
+  initial: { opacity: 0, y: 18, filter: 'blur(4px)' },
+  animate: { opacity: 1, y: 0, filter: 'blur(0px)', transition: spring },
 };
 
 /* ─── Help Content ─── */
@@ -690,10 +690,13 @@ export default function App() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* ════════ Header ════════ */}
-            <header className="sticky top-0 z-50 w-full glass-nav">
+            <header className="sticky top-0 z-50 w-full glass-nav" style={{ paddingBottom: '12px', overflow: 'visible' }}>
               <div className="max-w-[1120px] mx-auto px-5 py-3.5 flex items-center justify-between gap-4">
                 <div className="flex items-center">
-                  <h1 className="font-orbitron font-extrabold text-[1.25rem] tracking-[0.25em] text-[#FF5A00] select-none leading-none pt-0.5">
+                  <h1 
+                    className="font-orbitron font-extrabold text-[1.25rem] tracking-[0.25em] text-[#FF5A00] select-none leading-none pt-0.5"
+                    style={{ textShadow: '0 0 20px rgba(255, 90, 0, 0.3), 0 0 40px rgba(255, 90, 0, 0.1)' }}
+                  >
                     AERGIA
                   </h1>
                 </div>
@@ -759,7 +762,7 @@ export default function App() {
                             <p className="text-[0.7rem] font-bold uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--text-3)' }}>Pipeline</p>
                             <h3 className="text-xl font-bold tracking-tight">Sync Flow</h3>
                           </div>
-                          <div className={`badge ${isSyncing ? 'badge-active' : 'badge-idle'}`}>
+                          <div className={`badge ${isSyncing ? 'badge-active' : 'badge-idle'}`} style={isSyncing ? { animation: 'glowPulse 2s ease-in-out infinite' } : {}}>
                             <span className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-[#FF5A00] animate-pulse' : 'bg-white/15'}`} />
                             {isSyncing ? 'Syncing…' : 'Idle'}
                           </div>
@@ -777,34 +780,31 @@ export default function App() {
                               </linearGradient>
                             </defs>
 
-                            {/* Track: LeetCode -> Aergia Core */}
+                             {/* Track: LeetCode -> Aergia Core */}
                             <path 
                               d="M 16 50 L 50 50" 
                               className={`track-path ${leetcodeUsername ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                              strokeWidth={isSyncing ? 3 : 2}
                             />
                             {isSyncing && leetcodeUsername && (
-                              <path d="M 16 50 L 50 50" className="flow-path" strokeWidth={3} />
+                              <path d="M 16 50 L 50 50" className="flow-path" />
                             )}
 
                             {/* Track: Aergia Core -> GitHub */}
                             <path 
                               d="M 50 50 C 67 50, 67 25, 84 25" 
                               className={`track-path ${syncToGithub && githubRepo ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                              strokeWidth={isSyncing && syncToGithub && githubRepo ? 3 : 2}
                             />
                             {isSyncing && syncToGithub && githubRepo && (
-                              <path d="M 50 50 C 67 50, 67 25, 84 25" className="flow-path flow-path-github" strokeWidth={3} />
+                              <path d="M 50 50 C 67 50, 67 25, 84 25" className="flow-path flow-path-github" />
                             )}
 
                             {/* Track: Aergia Core -> Notion */}
                             <path 
                               d="M 50 50 C 67 50, 67 75, 84 75" 
                               className={`track-path ${syncToNotion && notionDbId ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                              strokeWidth={isSyncing && syncToNotion && notionDbId ? 3 : 2}
                             />
                             {isSyncing && syncToNotion && notionDbId && (
-                              <path d="M 50 50 C 67 50, 67 75, 84 75" className="flow-path flow-path-notion" strokeWidth={3} />
+                              <path d="M 50 50 C 67 50, 67 75, 84 75" className="flow-path flow-path-notion" />
                             )}
 
                             {/* Glowing Data Packets */}
@@ -812,90 +812,104 @@ export default function App() {
                               <path 
                                 d="M 16 50 L 50 50" 
                                 className="svg-packet packet-lc-engine" 
-                                strokeWidth={6}
                               />
                             )}
                             {isSyncing && syncToGithub && githubRepo && (
                               <path 
                                 d="M 50 50 C 67 50, 67 25, 84 25" 
                                 className="svg-packet packet-engine-gh" 
-                                strokeWidth={6}
                               />
                             )}
                             {isSyncing && syncToNotion && notionDbId && (
                               <path 
                                 d="M 50 50 C 67 50, 67 75, 84 75" 
                                 className="svg-packet packet-engine-notion" 
-                                strokeWidth={6}
                               />
                             )}
                           </svg>
 
                           {/* Node: LeetCode */}
                           <div 
-                            className={`pipe-card w-[100px] md:w-[155px] flex-col md:flex-row left-[16%] top-1/2 ${!leetcodeUsername ? 'inactive' : ''}`}
+                            className={`pipe-node-container pipe-node-lc ${leetcodeUsername ? 'active' : 'inactive'} ${leetcodeUsername && isSyncing ? 'syncing' : ''}`}
+                            style={{ left: '16%', top: '50%' }}
                             title={leetcodeUsername ? `LeetCode Account: @${leetcodeUsername}` : 'LeetCode not configured'}
                           >
-                            <span className={`led-dot ${leetcodeUsername ? (isSyncing ? 'led-syncing' : 'led-active') : 'led-inactive'}`} />
-                            <div className="icon-box w-8 h-8 md:w-9 md:h-9" style={{ background: leetcodeUsername ? 'rgba(255,159,10,0.08)' : 'var(--bg-inactive)', color: leetcodeUsername ? '#FF9F0A' : 'var(--color-inactive)', borderRadius: '10px' }}>
-                              <Code2 className="w-4.5 h-4.5 md:w-5 md:h-5" />
-                            </div>
-                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                              <span className="text-[0.7rem] md:text-xs font-bold leading-tight">LeetCode</span>
-                              <span className="text-[0.62rem] md:text-[0.68rem] font-medium max-w-[80px] truncate" style={{ color: 'var(--text-3)' }}>
-                                {leetcodeUsername ? `@${leetcodeUsername}` : 'Not set'}
-                              </span>
+                            <div className="pipe-connector-pin pin-right" />
+                            <div className="pipe-node-card">
+                              <div className="pipe-card-led" />
+                              <div className="pipe-card-icon-box">
+                                <Code2 className="w-4.5 h-4.5 md:w-5 md:h-5" style={{ color: leetcodeUsername ? '#FF9F0A' : 'var(--color-inactive)' }} />
+                              </div>
+                              <div className="pipe-card-text">
+                                <span className="pipe-card-title">LeetCode</span>
+                                <span className="pipe-card-subtitle truncate max-w-[80px] md:max-w-[110px]">
+                                  {leetcodeUsername ? `@${leetcodeUsername}` : 'Disabled'}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
                           {/* Node: Aergia Core */}
                           <div 
-                            className={`pipe-card pipe-card-core w-[110px] md:w-[165px] flex-col md:flex-row left-[50%] top-1/2 ${leetcodeUsername ? 'active' : 'inactive'} ${isSyncing ? 'syncing' : ''}`}
+                            className={`pipe-node-container pipe-node-core ${leetcodeUsername ? 'active' : 'inactive'} ${isSyncing ? 'syncing' : ''}`}
+                            style={{ left: '50%', top: '50%' }}
                             title={isSyncing ? 'Processing Data Pipeline' : 'Aergia Engine Ready'}
                           >
-                            <span className={`led-dot ${leetcodeUsername ? (isSyncing ? 'led-syncing animate-ping' : 'led-active') : 'led-inactive'}`} />
-                            <div className={`icon-box w-9 h-9 md:w-10 md:h-10 ${isSyncing ? 'animate-pulse' : ''}`} style={{ background: leetcodeUsername ? 'rgba(255,90,0,0.08)' : 'var(--bg-inactive)', color: leetcodeUsername ? '#FF5A00' : 'var(--color-inactive)', borderRadius: '12px' }}>
-                              <Cpu className={`w-5 h-5 md:w-5.5 md:h-5.5 ${isSyncing ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }} />
-                            </div>
-                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                              <span className="text-[0.75rem] md:text-sm font-black tracking-tight leading-tight">AERGIA CORE</span>
-                              <span className="text-[0.62rem] md:text-[0.68rem] font-medium" style={{ color: 'var(--text-3)' }}>
-                                {isSyncing ? 'Syncing...' : (leetcodeUsername ? 'Engine Ready' : 'Standby')}
-                              </span>
+                            <div className="pipe-connector-pin pin-left" />
+                            <div className="pipe-connector-pin pin-right" />
+                            <div className="pipe-node-card">
+                              <div className="pipe-card-led" />
+                              <div className="pipe-card-icon-box">
+                                <Cpu className={`w-5 h-5 md:w-5.5 md:h-5.5 ${isSyncing ? 'animate-spin' : ''}`} style={{ animationDuration: '6s', color: leetcodeUsername ? '#FF5A00' : 'var(--color-inactive)' }} />
+                              </div>
+                              <div className="pipe-card-text">
+                                <span className="pipe-card-title">AERGIA CORE</span>
+                                <span className="pipe-card-subtitle">
+                                  {isSyncing ? 'Syncing...' : (leetcodeUsername ? 'Engine Ready' : 'Standby')}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
                           {/* Node: GitHub */}
                           <div 
-                            className={`pipe-card w-[100px] md:w-[155px] flex-col md:flex-row left-[84%] top-[25%] ${!(syncToGithub && githubRepo) ? 'inactive' : ''}`}
+                            className={`pipe-node-container pipe-node-github ${syncToGithub && githubRepo ? 'active' : 'inactive'} ${syncToGithub && githubRepo && isSyncing ? 'syncing' : ''}`}
+                            style={{ left: '84%', top: '25%' }}
                             title={syncToGithub && githubRepo ? `GitHub Repository: ${githubRepo}` : 'GitHub Sync disabled'}
                           >
-                            <span className={`led-dot ${syncToGithub && githubRepo ? (isSyncing ? 'led-syncing' : 'led-active') : 'led-inactive'}`} />
-                            <div className="icon-box w-8 h-8 md:w-9 md:h-9" style={{ background: syncToGithub && githubRepo ? 'rgba(48,209,88,0.08)' : 'var(--bg-inactive)', color: syncToGithub && githubRepo ? '#30D158' : 'var(--color-inactive)', borderRadius: '10px' }}>
-                              <Github className="w-4.5 h-4.5 md:w-5 md:h-5" />
-                            </div>
-                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                              <span className="text-[0.7rem] md:text-xs font-bold leading-tight">GitHub</span>
-                              <span className="text-[0.62rem] md:text-[0.68rem] font-medium max-w-[80px] truncate" style={{ color: 'var(--text-3)' }}>
-                                {syncToGithub && githubRepo ? githubRepo.split('/')[1] : 'Disabled'}
-                              </span>
+                            <div className="pipe-connector-pin pin-left" />
+                            <div className="pipe-node-card">
+                              <div className="pipe-card-led" />
+                              <div className="pipe-card-icon-box">
+                                <Github className="w-4.5 h-4.5 md:w-5 md:h-5" style={{ color: syncToGithub && githubRepo ? '#30D158' : 'var(--color-inactive)' }} />
+                              </div>
+                              <div className="pipe-card-text">
+                                <span className="pipe-card-title">GitHub</span>
+                                <span className="pipe-card-subtitle truncate max-w-[80px] md:max-w-[110px]">
+                                  {syncToGithub && githubRepo ? githubRepo.split('/')[1] : 'Disabled'}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
                           {/* Node: Notion */}
                           <div 
-                            className={`pipe-card w-[100px] md:w-[155px] flex-col md:flex-row left-[84%] top-[75%] ${!(syncToNotion && notionDbId) ? 'inactive' : ''}`}
+                            className={`pipe-node-container pipe-node-notion ${syncToNotion && notionDbId ? 'active' : 'inactive'} ${syncToNotion && notionDbId && isSyncing ? 'syncing' : ''}`}
+                            style={{ left: '84%', top: '75%' }}
                             title={syncToNotion && notionDbId ? 'Notion database connected' : 'Notion Sync disabled'}
                           >
-                            <span className={`led-dot ${syncToNotion && notionDbId ? (isSyncing ? 'led-syncing' : 'led-active') : 'led-inactive'}`} />
-                            <div className="icon-box w-8 h-8 md:w-9 md:h-9" style={{ background: syncToNotion && notionDbId ? 'rgba(94,92,230,0.08)' : 'var(--bg-inactive)', color: syncToNotion && notionDbId ? '#5E5CE6' : 'var(--color-inactive)', borderRadius: '10px' }}>
-                              <Database className="w-4.5 h-4.5 md:w-5 md:h-5" />
-                            </div>
-                            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                              <span className="text-[0.7rem] md:text-xs font-bold leading-tight">Notion</span>
-                              <span className="text-[0.62rem] md:text-[0.68rem] font-medium max-w-[80px] truncate" style={{ color: 'var(--text-3)' }}>
-                                {syncToNotion && notionDbId ? 'Connected' : 'Disabled'}
-                              </span>
+                            <div className="pipe-connector-pin pin-left" />
+                            <div className="pipe-node-card">
+                              <div className="pipe-card-led" />
+                              <div className="pipe-card-icon-box">
+                                <Database className="w-4.5 h-4.5 md:w-5 md:h-5" style={{ color: syncToNotion && notionDbId ? '#5E5CE6' : 'var(--color-inactive)' }} />
+                              </div>
+                              <div className="pipe-card-text">
+                                <span className="pipe-card-title">Notion</span>
+                                <span className="pipe-card-subtitle truncate max-w-[80px] md:max-w-[110px]">
+                                  {syncToNotion && notionDbId ? 'Connected' : 'Disabled'}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
@@ -1036,7 +1050,15 @@ export default function App() {
                             ) : leetcodeStats ? (
                               <div className="space-y-4 mt-4">
                                 <div className="flex justify-between items-baseline">
-                                  <span className="text-5xl font-extrabold tracking-tighter">{allSolved}</span>
+                                  <motion.span 
+                                    className="text-5xl font-extrabold tracking-tighter"
+                                    key={allSolved}
+                                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ ...spring, duration: 0.6 }}
+                                  >
+                                    {allSolved}
+                                  </motion.span>
                                   <span className="text-sm font-medium" style={{ color: 'var(--text-3)' }}>/ {allTotal}</span>
                                 </div>
                                 <div className="space-y-3">
