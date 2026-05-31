@@ -1,5 +1,4 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Client as NotionClient } from '@notionhq/client';
@@ -8,11 +7,8 @@ import { Octokit } from '@octokit/rest';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
-
-  app.use(express.json());
+const app = express();
+app.use(express.json());
 
   // Helper to fetch from LeetCode GraphQL
   const fetchLeetCode = async (query: string, variables: any, sessionCookie?: string) => {
@@ -572,8 +568,13 @@ async function startServer() {
   });
 
 
+// Local dev server startup
+async function startLocalServer() {
+  const PORT = parseInt(process.env.PORT || '3000', 10);
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -592,4 +593,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startLocalServer();
+}
+
+export default app;

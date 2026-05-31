@@ -2,6 +2,8 @@
 
 > A premium, intelligent, local-first synchronization engine that automates developer workflows. It monitors, parses, and archives your LeetCode solutions to Notion and GitHub, utilizing Google's Gemini Pro developer API for automated solution analysis, complexity estimations, and pattern categorization.
 
+**🌐 Live Deployment:** [https://aergia-one.vercel.app/](https://aergia-one.vercel.app/)
+
 ---
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -10,6 +12,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-API_Integration-purple?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
 [![Notion SDK](https://img.shields.io/badge/Notion_SDK-2.3-black?logo=notion&logoColor=white)](https://developers.notion.com/)
 [![GitHub Octokit](https://img.shields.io/badge/GitHub_Octokit-22.0-lightgrey?logo=github&logoColor=white)](https://github.com/octokit/rest.js)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_App-black?logo=vercel&logoColor=white)](https://aergia-one.vercel.app/)
 
 ---
 
