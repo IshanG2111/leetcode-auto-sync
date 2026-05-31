@@ -1,5 +1,14 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "bundle": true
+      }
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
