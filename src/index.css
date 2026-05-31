@@ -494,6 +494,12 @@ body {
   border: 1px solid rgba(10, 132, 255, 0.15);
 }
 
+.badge-indigo {
+  background: rgba(94, 92, 230, 0.1);
+  color: var(--accent-indigo);
+  border: 1px solid rgba(94, 92, 230, 0.15);
+}
+
 /* ─────────── Stat Bars ─────────── */
 .bar-track {
   width: 100%;
@@ -1115,4 +1121,228 @@ body {
   40% { opacity: 1; }
   65% { stroke-dashoffset: 0; opacity: 1; }
   75%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* ─── Calming Global Theme Transition ─── */
+body, 
+.input, 
+.seg-control, 
+.bubble-bot, 
+.bubble-user, 
+.chat-panel, 
+.code-panel, 
+.badge, 
+.led-dot, 
+.icon-box,
+.track-path,
+header {
+  transition: background 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              backdrop-filter 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              stroke 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass, 
+.glass-solid, 
+.glass-subtle {
+  transition: transform 0.4s var(--ease-spring),
+              border-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              backdrop-filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn,
+.seg-btn,
+.chip {
+  transition: transform 0.25s var(--ease-spring),
+              background 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Premium Tooltip Social Buttons ─── */
+.tooltip-container {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 17px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  border-radius: 15px;
+  box-shadow: inset 5px 5px 5px rgba(0, 0, 0, 0.2),
+    inset -5px -5px 15px rgba(255, 255, 255, 0.1),
+    5px 5px 15px rgba(0, 0, 0, 0.3), -5px -5px 15px rgba(255, 255, 255, 0.1);
+  z-index: 100;
+}
+
+.light .tooltip-container .tooltip {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.tooltip-container .profile {
+  background: var(--bg-card);
+  border-radius: 10px 15px;
+  padding: 12px;
+  border: 1px solid var(--border-glass);
+}
+
+.tooltip-container:hover .tooltip {
+  top: -160px;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.tooltip-container .icon {
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  position: relative;
+}
+
+.tooltip-container .layer {
+  width: 55px;
+  height: 55px;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.tooltip-container .icon:hover .layer {
+  transform: rotate(-35deg) skew(20deg);
+}
+
+.tooltip-container .layer span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border: 1px solid;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.tooltip-container .icon:hover .layer span {
+  box-shadow: -1px 1px 3px currentColor;
+}
+
+.tooltip-container .icon .text {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  opacity: 0;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  transition: bottom 0.3s ease, opacity 0.3s ease;
+}
+
+.tooltip-container .icon:hover .text {
+  bottom: -30px;
+  opacity: 1;
+}
+
+.tooltip-container .icon:hover .layer span:nth-child(1) {
+  opacity: 0.2;
+}
+
+.tooltip-container .icon:hover .layer span:nth-child(2) {
+  opacity: 0.4;
+  transform: translate(4px, -4px);
+}
+
+.tooltip-container .icon:hover .layer span:nth-child(3) {
+  opacity: 0.6;
+  transform: translate(8px, -8px);
+}
+
+.tooltip-container .icon:hover .layer span:nth-child(4) {
+  opacity: 0.8;
+  transform: translate(12px, -12px);
+}
+
+.tooltip-container .icon:hover .layer span:nth-child(5) {
+  opacity: 1;
+  transform: translate(16px, -16px);
+}
+
+.tooltip-container .layer span.fab {
+  font-size: 30px;
+  line-height: 55px;
+  text-align: center;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tooltip-container .layer span.fab svg {
+  fill: inherit;
+}
+
+.tooltip-container .user {
+  display: flex;
+  gap: 12px;
+}
+
+.tooltip-container .img {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  font-weight: 800;
+  border: 1px solid;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-hover);
+  color: var(--text-1);
+}
+
+.tooltip-container .name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tooltip-container .username {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+
+.tooltip-container .details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--text-1);
+}
+
+.tooltip-container .about {
+  color: var(--text-2);
+  font-size: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-glass);
+  margin-top: 6px;
 }

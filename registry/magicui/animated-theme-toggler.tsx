@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
 export const AnimatedThemeToggler = ({
-  duration = 450,
+  duration = 1000,
   className = '',
 }) => {
   const [theme, setTheme] = useState(() => {
@@ -63,12 +63,13 @@ export const AnimatedThemeToggler = ({
       ];
       
       document.documentElement.animate(
-        {
-          clipPath,
-        },
+        [
+          { clipPath: clipPath[0], opacity: 0 },
+          { clipPath: clipPath[1], opacity: 1 }
+        ],
         {
           duration,
-          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
           pseudoElement: '::view-transition-new(root)',
         }
       );
@@ -89,7 +90,7 @@ export const AnimatedThemeToggler = ({
           rotate: theme === 'light' ? 90 : 0,
           opacity: theme === 'light' ? 0 : 1,
         }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center justify-center text-amber-300"
       >
         <Moon className="w-5 h-5" />
@@ -102,7 +103,7 @@ export const AnimatedThemeToggler = ({
           rotate: theme === 'light' ? 0 : -90,
           opacity: theme === 'light' ? 1 : 0,
         }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center justify-center text-orange-500"
       >
         <Sun className="w-5 h-5" />

@@ -8,8 +8,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import BlurText from './components/BlurText';
+import TextPressure from './components/TextPressure';
 import { GridScan } from './components/GridScan';
 import { AnimatedThemeToggler } from "@/registry/magicui/animated-theme-toggler";
+import Tooltip from './components/Tooltip';
+import profileImg from './profile.jpg';
 
 /* ─── Types ─── */
 interface Message {
@@ -24,14 +27,16 @@ interface SolvedItem {
   title: string;
   time: string;
   status: 'synced' | 'failed';
+  notion?: boolean;
+  github?: boolean;
 }
 
 /* ─── Motion Presets ─── */
 const spring = { type: "spring" as const, stiffness: 280, damping: 28 };
 const pageVariants = {
-  initial: { opacity: 0, y: 24, scale: 0.97 },
+  initial: { opacity: 0, y: 24, scale: 0.98 },
   animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -16, scale: 0.97 },
+  exit: { opacity: 0, y: -16, scale: 0.98 },
 };
 const stagger = {
   animate: { transition: { staggerChildren: 0.06 } },
@@ -91,7 +96,8 @@ const helpGuides: Record<string, { title: string; steps: string[] }> = {
 
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'assistant'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'assistant' | 'about'>('dashboard');
+  const [privacyModal, setPrivacyModal] = useState(false);
 
   // Settings
   const [leetcodeUsername, setLeetcodeUsername] = useState('');
@@ -254,13 +260,27 @@ export default function App() {
     const upd = [...recentSolves];
     newLogs.forEach(l => {
       if (l.includes('Successfully created') || l.includes('Successfully updated') || l.includes('Successfully pushed')) {
+        const isNotion = l.includes('[Notion]');
+        const isGithub = l.includes('[GitHub]');
         let t = '';
         if (l.includes('[Notion] Successfully created')) t = l.split('[Notion] Successfully created ')[1] || '';
         else if (l.includes('[Notion] Successfully updated')) t = l.split('[Notion] Successfully updated ')[1] || '';
         else if (l.includes('[GitHub] Successfully pushed')) t = l.split('[GitHub] Successfully pushed ')[1] || '';
         t = t.trim();
-        if (t && t !== 'Sync Complete! 🎉' && !upd.some(s => s.title.toLowerCase() === t.toLowerCase())) {
-          upd.unshift({ title: t, time: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }), status: 'synced' });
+        if (t && t !== 'Sync Complete! 🎉') {
+          const existingIdx = upd.findIndex(s => s.title.toLowerCase() === t.toLowerCase());
+          if (existingIdx > -1) {
+            if (isNotion) upd[existingIdx].notion = true;
+            if (isGithub) upd[existingIdx].github = true;
+          } else {
+            upd.unshift({
+              title: t,
+              time: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
+              status: 'synced',
+              notion: isNotion,
+              github: isGithub
+            });
+          }
         }
       }
     });
@@ -525,13 +545,66 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
+      {/* ── Privacy Policy Modal ── */}
+      <AnimatePresence>
+        {privacyModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6" onClick={() => setPrivacyModal(false)}>
+            <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 24 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 24 }}
+              transition={spring}
+              className="relative w-full max-w-lg glass-solid z-10 p-6 md:p-8"
+              onClick={e => e.stopPropagation()}
+            >
+              <button onClick={() => setPrivacyModal(false)} className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors">
+                <X className="w-4 h-4 text-white/50" />
+              </button>
+              
+              <div className="flex items-center gap-3.5 mb-5">
+                <Shield className="w-6 h-6 text-green-400" />
+                <h3 className="text-xl font-bold tracking-tight">Security & Privacy Policy</h3>
+              </div>
+
+              <div className="space-y-4 text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
+                <p>
+                  <strong>Aergia operates on an absolute local-first architecture.</strong> Here are the key security foundations of the synchronization system:
+                </p>
+                
+                <ul className="space-y-3 list-none pl-0">
+                  <li className="flex gap-2.5 items-start">
+                    <span className="text-green-400 shrink-0 select-none">✓</span>
+                    <span><strong>Local Only Storage</strong>: All session cookies, access tokens, and integration details are stored 100% inside your browser's Secure LocalStorage. Nothing is ever sent to or compiled on external cloud servers.</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start">
+                    <span className="text-green-400 shrink-0 select-none">✓</span>
+                    <span><strong>Direct Handshakes</strong>: All API requests (GitHub classic actions, LeetCode ingestion, Notion schemas) are routed directly from your local browser/dev node to their respective API servers.</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start">
+                    <span className="text-green-400 shrink-0 select-none">✓</span>
+                    <span><strong>Zero Telemetry</strong>: Aergia logs no diagnostics, collects no user identifiers, and has no background metric loggers. Your solving data belongs entirely to you.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-white/5 flex justify-end">
+                <button onClick={() => setPrivacyModal(false)} className="btn btn-primary px-6 py-2 text-xs font-semibold uppercase tracking-wider">
+                  Dismiss
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {showLanding ? (
           <motion.div
             key="landing"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             onClick={() => {
               setShowLanding(false);
             }}
@@ -549,25 +622,72 @@ export default function App() {
               scanDuration={2.6}
               scanDelay={1.5}
               className="absolute inset-0 w-full h-full"
+              style={undefined}
             />
 
-            {/* Center title only */}
-            <div className="z-10 flex flex-col items-center">
-              <BlurText 
-                text="AERGIA" 
-                delay={120} 
-                className="text-[4.5rem] sm:text-[7.5rem] font-extrabold font-orbitron tracking-[0.35em] mr-[-0.35em] leading-none text-white select-none text-center"
-                animateBy="letters"
-                direction="top"
-              />
-            </div>
+            {/* Center branding flow container to prevent overlap and look premium */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, filter: 'blur(16px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              className="z-10 flex flex-col items-center justify-center w-full max-w-[90vw] md:max-w-4xl mx-auto px-4 select-none pointer-events-auto gap-4"
+            >
+              {/* Constrain title max-width to avoid massive vertical scaling and overlap, no clipping */}
+              <div className="w-full max-w-xl md:max-w-2xl h-[120px] md:h-[180px] flex items-center justify-center relative mb-6">
+                <TextPressure 
+                  text="AERGIA"
+                  fontFamily="Compressa VF"
+                  fontUrl="https://res.cloudinary.com/dr6lvwubh/raw/upload/v1529908256/CompressaPRO-GX.woff2"
+                  width={true}
+                  weight={true}
+                  italic={true}
+                  alpha={false}
+                  flex={true}
+                  stroke={false}
+                  scale={false}
+                  textColor="#FFFFFF"
+                  minFontSize={64}
+                />
+              </div>
+
+              {/* Letter-staggered Subtitle */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center mb-4"
+              >
+                <BlurText
+                  text="THE PREMIER LEETCODE AUTOMATION ENGINE"
+                  className="text-xs md:text-sm font-semibold tracking-[0.3em] text-[#FF9FFC] opacity-80"
+                  delay={45}
+                  animateBy="letters"
+                  direction="bottom"
+                />
+              </motion.div>
+
+              {/* Pulsing indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.6, 0.3, 0.6] }}
+                transition={{ 
+                  delay: 2.2, 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  repeatType: "reverse" 
+                }}
+                className="mt-8 text-[10px] md:text-xs tracking-[0.25em] text-white/40 uppercase font-medium"
+              >
+                [ Click anywhere to initialize pipeline ]
+              </motion.div>
+            </motion.div>
           </motion.div>
         ) : (
           <motion.div
             key="app-core"
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* ════════ Header ════════ */}
             <header className="sticky top-0 z-50 w-full glass-nav">
@@ -580,9 +700,9 @@ export default function App() {
 
                 <div className="flex items-center gap-4.5">
                   <div className="seg-control">
-                    {(['dashboard', 'settings', 'assistant'] as const).map(t => (
+                    {(['dashboard', 'settings', 'assistant', 'about'] as const).map(t => (
                       <button key={t} onClick={() => setActiveTab(t)} className={`seg-btn ${activeTab === t ? 'active' : ''}`}>
-                        {t === 'dashboard' ? 'Dashboard' : t === 'settings' ? 'Settings' : 'Setup'}
+                        {t === 'dashboard' ? 'Dashboard' : t === 'settings' ? 'Settings' : t === 'assistant' ? 'Setup' : 'About'}
                         {t === 'assistant' && !leetcodeUsername && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-500 rounded-full animate-ping" />}
                       </button>
                     ))}
@@ -598,7 +718,7 @@ export default function App() {
 
                 {/* ═══ DASHBOARD ═══ */}
                 {activeTab === 'dashboard' && (
-                  <motion.div key="dash" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.4 }}>
+                  <motion.div key="dash" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
                     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-7">
 
                       {/* Dashboard Header */}
@@ -608,10 +728,27 @@ export default function App() {
                           <p className="text-sm mt-0.5" style={{ color: 'var(--text-3)' }}>Monitor and trigger your sync pipeline</p>
                         </div>
                         {leetcodeUsername && (
-                          <div className="flex items-center gap-2.5 text-xs font-semibold px-3.5 py-1.5 rounded-full bg-white/5 border border-white/5 shadow-sm animate-fade-in" style={{ color: 'var(--text-2)' }}>
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                            <span>LeetCode: @{leetcodeUsername}</span>
-                          </div>
+                          <motion.div 
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex items-center gap-3 font-mono text-[11px]" 
+                            style={{ color: 'var(--text-2)' }}
+                          >
+                            <span className="text-white/35 tracking-wider">LC PROFILE:</span>
+                            <a 
+                              href={`https://leetcode.com/u/${leetcodeUsername}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="font-bold text-[#FF9FFC] hover:text-[#0A84FF] transition-colors duration-300 border-b border-[#FF9FFC]/30 hover:border-[#0A84FF]/30 pb-0.5 flex items-center gap-1"
+                            >
+                              @{leetcodeUsername}
+                              <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                            </a>
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-bold tracking-widest uppercase">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                              LIVE
+                            </div>
+                          </motion.div>
                         )}
                       </motion.div>
 
@@ -805,19 +942,82 @@ export default function App() {
                               <div className="icon-box" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-2)' }}><Clock className="w-5 h-5" /></div>
                               <div><h3 className="text-lg font-bold tracking-tight">Activity</h3><p className="text-xs" style={{ color: 'var(--text-3)' }}>Recent syncs</p></div>
                             </div>
-                            <div className="min-h-[140px] max-h-[220px] overflow-y-auto space-y-0.5 px-1">
-                              {recentSolves.length === 0 ? (
+                            <div className="min-h-[140px] max-h-[220px] overflow-y-auto px-1">
+                              {recentSolves.length === 0 && !isSyncing ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
                                   <Bookmark className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.06)' }} />
                                   <p className="text-sm font-medium" style={{ color: 'var(--text-3)' }}>No activity yet</p>
                                   <p className="text-xs" style={{ color: 'var(--text-3)' }}>Run a sync to populate</p>
                                 </div>
-                              ) : recentSolves.map((s, i) => (
-                                <div key={i} className="flex items-center justify-between py-2.5 px-2.5 rounded-xl hover:bg-white/[0.03] transition-colors border-b last:border-0" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
-                                  <div className="min-w-0 mr-2"><p className="text-sm font-semibold truncate" style={{ color: 'var(--text-1)' }}>{s.title}</p><p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{s.time}</p></div>
-                                  <span className="badge badge-success text-xs shrink-0">Synced</span>
+                              ) : (
+                                <div className="w-full overflow-x-auto">
+                                  <table className="w-full border-collapse text-left">
+                                    <thead>
+                                      <tr className="border-b border-white/[0.04] text-[0.62rem] font-black tracking-wider uppercase" style={{ color: 'var(--text-3)' }}>
+                                        <th className="py-2 px-2.5">Problem</th>
+                                        <th className="py-2 px-2.5 text-center">Destinations</th>
+                                        <th className="py-2 px-2.5 text-right">Time</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {/* Syncing active row */}
+                                      {isSyncing && (
+                                        <tr className="animate-pulse border-b border-white/[0.02]" style={{ background: 'rgba(10,132,255,0.02)' }}>
+                                          <td className="py-2.5 px-2.5">
+                                            <div className="flex items-center gap-2">
+                                              <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                                              <span className="text-[0.68rem] font-bold italic text-blue-400">Syncing active solve...</span>
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5 px-2.5 text-center">
+                                            <div className="inline-flex gap-1 justify-center items-center">
+                                              {syncToGithub && <span className="w-1.5 h-1.5 rounded-full bg-green-400/60 animate-ping" />}
+                                              {syncToNotion && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60 animate-ping" />}
+                                              {!syncToGithub && !syncToNotion && <span className="w-1.5 h-1.5 rounded-full bg-blue-400/60 animate-ping" />}
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5 px-2.5 text-right text-[0.68rem]" style={{ color: 'var(--text-3)' }}>Pending...</td>
+                                        </tr>
+                                      )}
+                                      {/* Existing solves */}
+                                      {recentSolves.map((s, i) => (
+                                        <tr key={i} className="border-b border-white/[0.02] last:border-0 hover:bg-white/[0.015] transition-colors">
+                                          <td className="py-2.5 px-2.5 min-w-[120px] max-w-[200px]">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                              <div className="flex items-center justify-center shrink-0 w-6 h-6 rounded bg-white/5 border border-white/5" style={{ color: 'var(--text-2)' }}>
+                                                <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                                              </div>
+                                              <span className="text-xs font-bold text-white truncate" style={{ color: 'var(--text-1)' }}>{s.title}</span>
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5 px-2.5 text-center">
+                                            <div className="inline-flex gap-1 justify-center">
+                                              {s.github && (
+                                                <span className="badge badge-success text-[0.58rem] px-1.5 py-0.5 font-bold uppercase tracking-wider flex items-center gap-0.5 shrink-0">
+                                                  <Github className="w-2.5 h-2.5" /> GH
+                                                </span>
+                                              )}
+                                              {s.notion && (
+                                                <span className="badge badge-indigo text-[0.58rem] px-1.5 py-0.5 font-bold uppercase tracking-wider flex items-center gap-0.5 shrink-0">
+                                                  <Database className="w-2.5 h-2.5" /> NT
+                                                </span>
+                                              )}
+                                              {!s.github && !s.notion && (
+                                                <span className="badge badge-success text-[0.58rem] px-1.5 py-0.5">
+                                                  SYNCED
+                                                </span>
+                                              )}
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5 px-2.5 text-right text-[0.68rem] whitespace-nowrap" style={{ color: 'var(--text-3)' }}>
+                                            {s.time}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
                                 </div>
-                              ))}
+                              )}
                             </div>
                             <div className="pt-2.5 mt-1 text-center text-xs font-medium" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', color: 'var(--text-3)' }}>{recentSolves.length} recorded</div>
                           </motion.div>
@@ -952,7 +1152,7 @@ export default function App() {
 
                 {/* ═══ SETTINGS ═══ */}
                 {activeTab === 'settings' && (
-                  <motion.div key="set" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.4 }}>
+                  <motion.div key="set" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
                     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-7 max-w-2xl mx-auto pb-10">
                       <motion.div variants={cardVariant} className="space-y-2">
                         <h2 className="text-[2.5rem] font-extrabold tracking-tight">Settings</h2>
@@ -1037,7 +1237,7 @@ export default function App() {
 
                 {/* ═══ ASSISTANT ═══ */}
                 {activeTab === 'assistant' && (
-                  <motion.div key="ast" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.4 }}>
+                  <motion.div key="ast" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
                     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-7">
                       <motion.div variants={cardVariant} className="space-y-2">
                         <h2 className="text-[2.5rem] font-extrabold tracking-tight">Quick Setup</h2>
@@ -1099,6 +1299,145 @@ export default function App() {
                           </div>
                         </div>
                       </motion.div>
+                    </motion.div>
+                  </motion.div>
+                )}
+
+                {/* ═══ ABOUT ═══ */}
+                {activeTab === 'about' && (
+                  <motion.div key="abt" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ ...spring, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+                    <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-8 max-w-4xl mx-auto pb-10">
+                      
+                      {/* Top Heading */}
+                      <motion.div variants={cardVariant} className="text-center md:text-left space-y-1.5">
+                        <h2 className="text-[2.5rem] font-extrabold tracking-tight">About Aergia</h2>
+                        <p className="text-lg font-medium text-white/50" style={{ color: 'var(--text-2)' }}>The technology, structure, and design architect.</p>
+                      </motion.div>
+
+                      {/* Main Showcase Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                        
+                        {/* Left Column: Halftone Avatar & Tooltips (md:col-span-5) */}
+                        <motion.div variants={cardVariant} className="md:col-span-5 glass flex flex-col items-center gap-6 p-6">
+                          
+                          {/* Image Wrapper */}
+                          <div className="relative group shrink-0 w-48 h-48 md:w-56 md:h-56">
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#FF9FFC] to-[#0A84FF] opacity-15 group-hover:opacity-35 blur-xl transition-all duration-500" />
+                            <div className="relative w-full h-full rounded-3xl bg-gradient-to-tr from-[#FF9FFC] to-[#0A84FF] p-[1.5px] shadow-2xl overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
+                              <img 
+                                src={profileImg} 
+                                alt="Ishan Ghosh Halftone Portrait" 
+                                className="w-full h-full object-cover rounded-[22px] grayscale contrast-125"
+                                style={{ mixBlendMode: 'luminosity' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Profile Minimal details */}
+                          <div className="text-center space-y-1.5">
+                            <span className="badge badge-success text-[0.62rem] px-2.5 py-0.5 font-extrabold uppercase tracking-wider">Engine Architect</span>
+                            <h3 className="text-2xl font-black tracking-tight" style={{ color: 'var(--text-1)' }}>Ishan Ghosh</h3>
+                            <p className="text-xs font-mono tracking-wide text-white/40 uppercase">Full Stack & Automation</p>
+                          </div>
+
+                          {/* Tooltips list */}
+                          <div className="flex justify-center items-center gap-8 w-full border-t border-white/[0.04] pt-6 mt-2">
+                            <Tooltip 
+                              platform="linkedin"
+                              url="https://www.linkedin.com/in/ishan-ghosh-7b33a4336/"
+                              name="Ishan Ghosh"
+                              username="@ishan-ghosh-7b33a4336"
+                              avatarText="IG"
+                              iconPath="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"
+                              colorTheme="#0A84FF"
+                            />
+                            
+                            <Tooltip 
+                              platform="github"
+                              url="https://github.com/IshanG2111"
+                              name="Ishan Ghosh"
+                              username="@IshanG2111"
+                              avatarText="IG"
+                              iconPath="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                              viewBox="0 0 16 16"
+                              colorTheme="#FF9FFC"
+                            />
+                          </div>
+
+                        </motion.div>
+
+                        {/* Right Column: Architectural Details & How it Works (md:col-span-7) */}
+                        <div className="md:col-span-7 space-y-6">
+                          
+                          {/* Architect Statement */}
+                          <motion.div variants={cardVariant} className="glass">
+                            <h4 className="text-sm font-black uppercase tracking-[0.15em] mb-2 text-[#FF9FFC]">Philosophy</h4>
+                            <p className="text-[0.95rem] leading-relaxed text-white/70" style={{ color: 'var(--text-2)' }}>
+                              "Aergia was designed out of a need for clean, reliable, and zero-compromise developer productivity. Every element in its layout, visual timeline, and local schema is built with state-of-the-art web tokens to bring a beautiful, premium console directly to your browser."
+                            </p>
+                          </motion.div>
+
+                          {/* How it Works Section */}
+                          <motion.div variants={cardVariant} className="glass space-y-4">
+                            <h4 className="text-sm font-black uppercase tracking-[0.15em] text-[#0A84FF]">System Architecture</h4>
+                            
+                            <div className="space-y-4 pt-2">
+                              {/* 1. Sync engine */}
+                              <div className="flex gap-3.5 items-start">
+                                <div className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border border-green-500/30 text-green-400 bg-green-500/5">1</div>
+                                <div>
+                                  <h5 className="text-xs font-bold uppercase tracking-wider text-white" style={{ color: 'var(--text-1)' }}>LeetCode Ingestion</h5>
+                                  <p className="text-xs leading-relaxed text-white/50 mt-0.5" style={{ color: 'var(--text-3)' }}>
+                                    Pulls your profiles directly via public GraphQL APIs or securely authenticates through your session cookie for detailed code submissions.
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* 2. Notion storage */}
+                              <div className="flex gap-3.5 items-start">
+                                <div className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border border-indigo-500/30 text-indigo-400 bg-indigo-500/5">2</div>
+                                <div>
+                                  <h5 className="text-xs font-bold uppercase tracking-wider text-white" style={{ color: 'var(--text-1)' }}>Notion Database Sync</h5>
+                                  <p className="text-xs leading-relaxed text-white/50 mt-0.5" style={{ color: 'var(--text-3)' }}>
+                                    Creates pages inside your Notion database, automatically structuring metadata tags (difficulty, tags, submission time, solutions).
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* 3. GitHub repository */}
+                              <div className="flex gap-3.5 items-start">
+                                <div className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border border-blue-500/30 text-blue-400 bg-blue-500/5">3</div>
+                                <div>
+                                  <h5 className="text-xs font-bold uppercase tracking-wider text-white" style={{ color: 'var(--text-1)' }}>GitHub Automations</h5>
+                                  <p className="text-xs leading-relaxed text-white/50 mt-0.5" style={{ color: 'var(--text-3)' }}>
+                                    Structures solved files in a professional markdown directory inside your repo classic paths, recording chronological commit progress.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+
+                        </div>
+
+                      </div>
+
+                      {/* Policy & Security Footer Button */}
+                      <motion.div variants={cardVariant} className="pt-6 border-t border-white/[0.04] text-center space-y-3">
+                        <div className="flex items-center justify-center gap-1.5 text-xs text-white/45" style={{ color: 'var(--text-3)' }}>
+                          <Shield className="w-3.5 h-3.5 text-green-400" />
+                          <span>100% Client-Side. No telemetry. No database logging.</span>
+                        </div>
+                        <div>
+                          <button 
+                            onClick={() => setPrivacyModal(true)} 
+                            className="btn btn-ghost py-2 px-5 text-xs font-semibold uppercase tracking-wider"
+                            style={{ borderRadius: 'var(--r-pill)' }}
+                          >
+                            Read Full Privacy Policy
+                          </button>
+                        </div>
+                      </motion.div>
+
                     </motion.div>
                   </motion.div>
                 )}
