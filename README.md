@@ -1,102 +1,95 @@
-# Aergia Engine
+# ✦ Aergia Engine
 
-> A premium, intelligent, local-first synchronization engine that automates developer workflows. It monitors, parses, and archives your LeetCode solutions to Notion and GitHub, utilizing Google's Gemini Pro developer API for automated solution analysis, complexity estimations, and pattern categorization.
+> A premium, intelligent developer automation pipeline. Aergia automatically monitors your solved LeetCode solutions, processes them through an intelligent pipeline, commits organized solutions to GitHub, and registers rich metadata inside Notion databases.
 
-**🌐 Live Deployment:** [https://aergia-one.vercel.app/](https://aergia-one.vercel.app/)
-
----
-
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.0-cyan?logo=react&logoColor=white)](https://react.dev/)
-[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?logo=three.js&logoColor=white)](https://threejs.org/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-API_Integration-purple?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
-[![Notion SDK](https://img.shields.io/badge/Notion_SDK-2.3-black?logo=notion&logoColor=white)](https://developers.notion.com/)
-[![GitHub Octokit](https://img.shields.io/badge/GitHub_Octokit-22.0-lightgrey?logo=github&logoColor=white)](https://github.com/octokit/rest.js)
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live_App-black?logo=vercel&logoColor=white)](https://aergia-one.vercel.app/)
+<p align="left">
+  <a href="https://aergia-one.vercel.app/"><img src="https://img.shields.io/badge/Live_App-aergia--one.vercel.app-FF5A00?style=flat-square&logo=vercel&logoColor=white" alt="Live Deployment"></a>
+  <img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Three.js-WebGL-000000?style=flat-square&logo=three.js&logoColor=white" alt="Three.js">
+  <img src="https://img.shields.io/badge/Notion_SDK-2.3-000000?style=flat-square&logo=notion&logoColor=white" alt="Notion">
+  <img src="https://img.shields.io/badge/GitHub_API-Octokit-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+</p>
 
 ---
 
-## 🚀 Overview
+## 📐 Architecture & Flow
 
-**Aergia Engine** is a high-end developer utility designed with a calm, premium Apple iOS-style aesthetic. It bridges the gap between active problem solving and knowledge archiving. Rather than manually copying code and writing explanations, this engine acts as a pipeline that:
-
-1. **Fetches** your latest Accepted (AC) submissions directly via the **LeetCode GraphQL API**.
-2. **Analyzes** code using the **Google Gemini API** to run static code intelligence, detecting algorithm design patterns (e.g., Backtracking, Sliding Window, Dynamic Programming), complexity classes ($O(N)$, $O(N \log N)$), and producing markdown documentation.
-3. **Synchronizes** code to your **GitHub repository** organized in structural folder hierarchies based on problem difficulty.
-4. **Organizes** your learning inside a **Notion Database** with pre-configured schemas.
-
----
-
-## 📐 System Architecture
-
-Below is the design flow showing how data moves across the APIs during a sync event:
+Aergia coordinates transactions between several platforms to ensure your portfolio stays synchronized in real time:
 
 ```mermaid
-graph TD
-    A[LeetCode GraphQL API] -->|1. Fetch AC Submissions| B[Aergia Express Engine]
-    B -->|2. Extract Source Code| C[Google Gemini API]
-    C -->|3. Perform Code Intelligence Analysis<br>Identify Patterns & Complexity| B
-    B -->|4. Push Code to Organized Paths| D[GitHub API via Octokit]
-    B -->|5. Insert/Update Page with Rich Metadata| E[Notion DB via SDK]
+flowchart LR
+    subgraph Ingestion [Source]
+        A([LeetCode GraphQL])
+    end
 
-    style A fill:#f39c12,stroke:#d35400,stroke-width:2px,color:#fff
-    style B fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
-    style C fill:#9b59b6,stroke:#8e44ad,stroke-width:2px,color:#fff
-    style D fill:#2c3e50,stroke:#1a252f,stroke-width:2px,color:#fff
-    style E fill:#000,stroke:#333,stroke-width:2px,color:#fff
+    subgraph Core [Aergia Core Engine]
+        B{Sync Handler}
+    end
+
+    subgraph Destination [Workspaces]
+        D[(GitHub Repo)]
+        E[(Notion DB)]
+    end
+
+    A -->|1. Fetch Solved Problems| B
+    B -->|2. Solution Code & Metadata| A
+    B -->|3. Commit Organized Code| D
+    B -->|4. Update Properties & Schema| E
+
+    %% Theme Styling
+    classDef default fill:#1e1e24,stroke:#333,stroke-width:1px,color:#eee;
+    classDef core fill:#0A84FF22,stroke:#0A84FF,stroke-width:2px,color:#0A84FF;
+    classDef dest fill:#30D15822,stroke:#30D158,stroke-width:1.5px,color:#30D158;
+    classDef src fill:#FFA11622,stroke:#FFA116,stroke-width:1.5px,color:#FFA116;
+
+    class B core;
+    class D,E dest;
+    class A src;
 ```
 
 ---
 
-## ✨ Key Features
+## ✨ Key Capabilities
 
-### 🎨 Apple-Style Translucent Design System
-- **iOS 18 Glassmorphism**: Cards feature frosted surfaces with double-border light reflections (simulating macOS/iOS window edges).
-- **Subtle Branding Details**: Hover states trigger a high-end, responsive scan-pink (`#FF9FFC`) glow.
-- **Ambient Grid Theme**: A repeating vector grid overlay sits behind the interface, matching the visual language of the landing engine.
+### 🎨 Premium Translucent Interface (iOS 18 Grid Aesthetic)
+*   **Frosted Glassmorphism:** Custom components styled with light-refracting double-borders simulating native macOS/iOS window panels.
+*   **Micro-Interactions:** Hover states trigger interactive scanning glows (`#FF9FFC`) and coordinate readouts.
+*   **Ambient Mesh Overlay:** A minimal mathematical vector grid is layered dynamically over the background.
 
-### 🌌 Interactive WebGL Landing Screen
-- **Three.js GridScan Shader**: Renders a floating coordinate scan line system that skews and tilts dynamically based on mouse movements, gyroscope tilt, or active face-tracking.
-- **Face-Tracking Scanner**: Uses `face-api.js` models to track face yaw, pitch, and distance via webcam, translating movements directly into 3D shader rotations.
-- **Framer Motion Typography**: Headline text enters using custom character blur keyframes.
+### 🌌 Interactive 3D WebGL Scanner
+*   **Three.js Shader Grid:** Renders an interactive WebGL coordinate mesh that skews and responds to user focus.
+*   **Device-Aware Ingestion:** Translates face tracking coordinates (via `face-api.js`) or cursor coordinates to control 3D viewport orientation.
+*   **Cinematic Entrance:** Staggered character blur-to-focus transition hooks built on top of Framer Motion.
 
-### ⚙️ Automation & Control
-- **Sync Flow ribbon**: A visual dashboard pipeline showing real-time states (`LeetCode ── Process ── GitHub ── Notion`).
-- **Guided Chat Setup Assistant**: Interactive onboarding chat terminal that stores credentials locally in the browser's localStorage.
-- **Notion Schema Deployment**: Connects with the Notion SDK to automatically verify and deploy all required database properties.
+### ⚡ Unified Sync Pipeline
+*   **Dual Target Synced Actions:** Instantly backs up solved problems onto GitHub while registering details in Notion databases.
+*   **Automated Notion Database Provisioning:** Configures missing table schemas (time/space complexity, pattern labels, difficulty) using a single endpoint trigger.
+*   **Intuitive Setup Chat:** Interactive chatbot onboarding console that preserves configuration properties locally in the client storage.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend Core**: React 19, TypeScript, Three.js, Postprocessing, Face-api.js, Tailwind CSS, Motion (framer-motion).
-- **Backend Sync Engine**: Node.js, Express, Vite Dev Middleware (during development), TSX runner.
-- **APIs & SDKs**:
-  - Google Gemini Developer API (`@google/genai`)
-  - Notion API (`@notionhq/client`)
-  - GitHub Octokit API (`@octokit/rest`)
+*   **Frontend Core:** React 19, TypeScript, Three.js, postprocessing, face-api.js, Tailwind CSS, Motion (framer-motion)
+*   **Backend Sync Engine:** Express, Node.js, tsx runner
+*   **Integrations:** Notion Client SDK (`@notionhq/client`), GitHub Octokit (`@octokit/rest`), Google Gemini API (`@google/genai`)
 
 ---
 
 ## ⚙️ Configuration & Prerequisites
 
-### Prerequisites
-- Node.js 18+ (LTS recommended)
-- A Google Gemini API Key (obtained from the [Google AI Developer Portal](https://ai.google.dev/))
-- A GitHub Personal Access Token (PAT) with repository permissions
-- A Notion Integration Token and Database ID
+### 1. Prerequisites
+*   **Node.js** 18+ (LTS recommended)
+*   **GitHub PAT** (Personal Access Token) with repository scopes
+*   **Notion Integration Secret** and a connected target Database ID
+*   **LeetCode Session Cookie** (required to sync all historically solved problems)
 
-### Environment Setup
-Clone the configuration template and populate your local variables:
-
-```bash
-cp .env.example .env.local
-```
-
-Modify `.env.local` with your configuration details:
+### 2. Environment Variables
+Create a `.env.local` inside the root folder:
 
 ```env
-# Google Gemini API key
+# Google Gemini API key (for intelligent analytics)
 GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 
 # Base Application Host URL
@@ -108,68 +101,63 @@ APP_URL="http://localhost:3000"
 ## 🚀 Getting Started
 
 ### 1. Installation
-Install all dependencies (including WebGL, face tracking, and utility engines):
-
+Clone the repository and install all development dependencies:
 ```bash
 npm install
 ```
 
-### 2. Development Mode
-Run the development environment locally. The server is integrated into a unified Express endpoint serving the frontend via Vite dev middleware:
-
+### 2. Run Local Development Server
+Starts the unified Express server and spins up the Vite development server:
 ```bash
 npm run dev
 ```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser to initialize setup.
 
-The application dashboard will be accessible at: `http://localhost:3000`
-
-### 3. Production Build & Execution
-Build the static frontend bundle and start the server in production mode:
-
+### 3. Build & Production Start
+Compile assets and start the application in optimized production mode:
 ```bash
-# Build the optimized client bundle
 npm run build
-
-# Start the Node runtime server
 npm run start
 ```
 
 ---
 
-## 📦 Project Structure
+## 📦 Project Layout
 
 ```
-├── .env.example             # Example environment file
-├── server.ts                # Express backend & Sync Engine
-├── vite.config.ts           # Bundler configuration
-├── index.html               # Main entry HTML (renamed title)
-├── tsconfig.json            # TypeScript configuration
-├── package.json             # App dependencies & scripts
-└── src/
-    ├── main.tsx             # React DOM entry point
-    ├── App.tsx              # Settings & Dashboard UI (Aergia Engine)
-    ├── index.css            # Stylesheet & double-border reflection patterns
-    └── components/
-        ├── BlurText.tsx     # Motion blur-to-focus animation
-        ├── GridScan.jsx     # WebGL scanner (Three.js + face-api)
-        └── GridScan.css     # Mirror effects and coordinates preview
+├── api/
+│   └── index.ts        # Express REST API & Ingestion Middleware
+├── src/
+│   ├── components/
+│   │   ├── BlurText.tsx    # Smooth typography reveals
+│   │   ├── GridScan.jsx    # Three.js coordinate scanner
+│   │   └── Tooltip.tsx     # Context-aware helpers
+│   ├── App.tsx         # Core Dashboard Layout & Assistant
+│   └── index.css       # Glassmorphism theme definitions
+├── server.ts           # Unified Vite + Express Server Entry
+├── vercel.json         # Vercel Serverless Routing Schema
+└── package.json        # Dependencies & Automation Scripts
 ```
 
 ---
 
-## 🌟 Google Cloud Deployment
+## 🌐 Deploy to Production
 
-To run this application as a serverless cron job (e.g., syncing your solves every night automatically), you can deploy it to **Google Cloud Platform (GCP)**:
+### Vercel Serverless
+Aergia includes optimized Vercel rewrite configuration for serverless runtime. Simply deploy via the Vercel Dashboard or CLI:
+```bash
+vercel
+```
 
-1. **Build Container**: Package the application into a Docker container.
-2. **Deploy to Google Cloud Run**: Deploy the container as a serverless service:
-   ```bash
-   gcloud run deploy aergia-engine --source . --platform managed
-   ```
-3. **Configure Google Cloud Scheduler**: Set up a daily cron trigger hitting `/api/sync` with your configuration payload, enabling fully automated, zero-maintenance background syncing.
+### Google Cloud Run
+Package and execute Aergia as a secure, auto-scaling backend container:
+```bash
+gcloud run deploy aergia-engine --source . --platform managed
+```
+Use **Google Cloud Scheduler** to set up a cron job targeting `/api/sync` for automated overnight backups.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
