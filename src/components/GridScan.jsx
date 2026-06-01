@@ -294,11 +294,7 @@ export const GridScan = ({
   scanOnClick = false,
   snapBackDelay = 250,
   className,
-  style,
-  // Permissive parameters to ignore but not break existing API calls
-  enableWebcam = false,
-  showPreview = false,
-  modelsPath = ''
+  style
 }) => {
   const [isLowEnd, setIsLowEnd] = useState(false);
   const containerRef = useRef(null);

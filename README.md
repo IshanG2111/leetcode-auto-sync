@@ -59,7 +59,7 @@ flowchart LR
 
 ### 🌌 Interactive 3D WebGL Scanner
 *   **Three.js Shader Grid:** Renders an interactive WebGL coordinate mesh that skews and responds to user focus.
-*   **Device-Aware Ingestion:** Translates face tracking coordinates (via `face-api.js`) or cursor coordinates to control 3D viewport orientation.
+*   **Device-Aware Ingestion:** Translates desktop cursor or mobile gyroscope movement to control 3D viewport orientation.
 *   **Cinematic Entrance:** Staggered character blur-to-focus transition hooks built on top of Framer Motion.
 
 ### ⚡ Unified Sync Pipeline
@@ -71,9 +71,9 @@ flowchart LR
 
 ## 🛠️ Technology Stack
 
-*   **Frontend Core:** React 19, TypeScript, Three.js, postprocessing, face-api.js, Tailwind CSS, Motion (framer-motion)
+*   **Frontend Core:** React 19, TypeScript, Three.js, postprocessing, Tailwind CSS, Motion (framer-motion)
 *   **Backend Sync Engine:** Express, Node.js, tsx runner
-*   **Integrations:** Notion Client SDK (`@notionhq/client`), GitHub Octokit (`@octokit/rest`), Google Gemini API (`@google/genai`)
+*   **Integrations:** Notion Client SDK (`@notionhq/client`), GitHub Octokit (`@octokit/rest`)
 
 ---
 
@@ -89,9 +89,6 @@ flowchart LR
 Create a `.env.local` inside the root folder:
 
 ```env
-# Google Gemini API key (for intelligent analytics)
-GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
-
 # Base Application Host URL
 APP_URL="http://localhost:3000"
 ```
