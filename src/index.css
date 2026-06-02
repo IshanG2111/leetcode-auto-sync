@@ -1151,7 +1151,7 @@ body {
   padding: 0 0.75rem;
   border-radius: 12px;
   background: rgba(20, 20, 23, 0.75);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow: 
