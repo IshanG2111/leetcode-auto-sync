@@ -7,6 +7,7 @@ import {
   Shield, ArrowRight, Bookmark, Clock, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { animate, createDrawable } from 'animejs';
 import BlurText from './components/BlurText';
 import TextPressure from './components/TextPressure';
 import { GridScan } from './components/GridScan';
@@ -157,6 +158,54 @@ export default function App() {
 
   const logsEnd = useRef<HTMLDivElement>(null);
   const chatEnd = useRef<HTMLDivElement>(null);
+
+  const lcToCorePacketRef = useRef<SVGPathElement>(null);
+  const coreToGhPacketRef = useRef<SVGPathElement>(null);
+  const coreToNotionPacketRef = useRef<SVGPathElement>(null);
+
+  /* ─── Pipeline Animations (Anime.js createDrawable) ─── */
+  useEffect(() => {
+    let animLc: any = null;
+    let animGh: any = null;
+    let animNotion: any = null;
+
+    if (isSyncing) {
+      if (leetcodeUsername && lcToCorePacketRef.current) {
+        animLc = animate(createDrawable(lcToCorePacketRef.current), {
+          draw: ['0 0', '0 0.15', '0.85 1', '1 1'],
+          duration: 1600,
+          ease: 'linear',
+          loop: true,
+        });
+      }
+
+      if (syncToGithub && githubRepo && coreToGhPacketRef.current) {
+        animGh = animate(createDrawable(coreToGhPacketRef.current), {
+          draw: ['0 0', '0 0.15', '0.85 1', '1 1'],
+          duration: 1600,
+          delay: 500,
+          ease: 'linear',
+          loop: true,
+        });
+      }
+
+      if (syncToNotion && notionDbId && coreToNotionPacketRef.current) {
+        animNotion = animate(createDrawable(coreToNotionPacketRef.current), {
+          draw: ['0 0', '0 0.15', '0.85 1', '1 1'],
+          duration: 1600,
+          delay: 500,
+          ease: 'linear',
+          loop: true,
+        });
+      }
+    }
+
+    return () => {
+      if (animLc) animLc.cancel();
+      if (animGh) animGh.cancel();
+      if (animNotion) animNotion.cancel();
+    };
+  }, [isSyncing, leetcodeUsername, syncToGithub, githubRepo, syncToNotion, notionDbId]);
 
   /* ─── Toast helper ─── */
   const showToast = useCallback((msg: string) => {
@@ -781,51 +830,66 @@ export default function App() {
                             </defs>
 
                              {/* Track: LeetCode -> Aergia Core */}
-                            <path 
-                              d="M 16 50 L 50 50" 
-                              className={`track-path ${leetcodeUsername ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                            />
-                            {isSyncing && leetcodeUsername && (
-                              <path d="M 16 50 L 50 50" className="flow-path" />
-                            )}
+                             <path 
+                               d="M 16 50 L 50 50" 
+                               className={`track-path ${leetcodeUsername ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
+                             />
+                             {isSyncing && leetcodeUsername && (
+                               <path d="M 16 50 L 50 50" className="flow-path" />
+                             )}
 
-                            {/* Track: Aergia Core -> GitHub */}
-                            <path 
-                              d="M 50 50 C 67 50, 67 25, 84 25" 
-                              className={`track-path ${syncToGithub && githubRepo ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                            />
-                            {isSyncing && syncToGithub && githubRepo && (
-                              <path d="M 50 50 C 67 50, 67 25, 84 25" className="flow-path flow-path-github" />
-                            )}
+                             {/* Track: Aergia Core -> GitHub */}
+                             <path 
+                               d="M 50 50 C 67 50, 67 25, 84 25" 
+                               className={`track-path ${syncToGithub && githubRepo ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
+                             />
+                             {isSyncing && syncToGithub && githubRepo && (
+                               <path d="M 50 50 C 67 50, 67 25, 84 25" className="flow-path flow-path-github" />
+                             )}
 
-                            {/* Track: Aergia Core -> Notion */}
-                            <path 
-                              d="M 50 50 C 67 50, 67 75, 84 75" 
-                              className={`track-path ${syncToNotion && notionDbId ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
-                            />
-                            {isSyncing && syncToNotion && notionDbId && (
-                              <path d="M 50 50 C 67 50, 67 75, 84 75" className="flow-path flow-path-notion" />
-                            )}
+                             {/* Track: Aergia Core -> Notion */}
+                             <path 
+                               d="M 50 50 C 67 50, 67 75, 84 75" 
+                               className={`track-path ${syncToNotion && notionDbId ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
+                             />
+                             {isSyncing && syncToNotion && notionDbId && (
+                               <path d="M 50 50 C 67 50, 67 75, 84 75" className="flow-path flow-path-notion" />
+                             )}
 
-                            {/* Glowing Data Packets */}
-                            {isSyncing && leetcodeUsername && (
-                              <path 
-                                d="M 16 50 L 50 50" 
-                                className="svg-packet packet-lc-engine" 
-                              />
-                            )}
-                            {isSyncing && syncToGithub && githubRepo && (
-                              <path 
-                                d="M 50 50 C 67 50, 67 25, 84 25" 
-                                className="svg-packet packet-engine-gh" 
-                              />
-                            )}
-                            {isSyncing && syncToNotion && notionDbId && (
-                              <path 
-                                d="M 50 50 C 67 50, 67 75, 84 75" 
-                                className="svg-packet packet-engine-notion" 
-                              />
-                            )}
+                             {/* Glowing Data Packets */}
+                             {isSyncing && leetcodeUsername && (
+                               <path 
+                                 ref={lcToCorePacketRef}
+                                 d="M 16 50 L 50 50" 
+                                 fill="none"
+                                 stroke="#FF9F0A"
+                                 strokeWidth="2.5"
+                                 strokeLinecap="round"
+                                 style={{ filter: 'drop-shadow(0 0 5px #FF9F0A)' }}
+                               />
+                             )}
+                             {isSyncing && syncToGithub && githubRepo && (
+                               <path 
+                                 ref={coreToGhPacketRef}
+                                 d="M 50 50 C 67 50, 67 25, 84 25" 
+                                 fill="none"
+                                 stroke="#30D158"
+                                 strokeWidth="2.5"
+                                 strokeLinecap="round"
+                                 style={{ filter: 'drop-shadow(0 0 5px #30D158)' }}
+                               />
+                             )}
+                             {isSyncing && syncToNotion && notionDbId && (
+                               <path 
+                                 ref={coreToNotionPacketRef}
+                                 d="M 50 50 C 67 50, 67 75, 84 75" 
+                                 fill="none"
+                                 stroke="#5E5CE6"
+                                 strokeWidth="2.5"
+                                 strokeLinecap="round"
+                                 style={{ filter: 'drop-shadow(0 0 5px #5E5CE6)' }}
+                               />
+                             )}
                           </svg>
 
                           {/* Node: LeetCode */}
