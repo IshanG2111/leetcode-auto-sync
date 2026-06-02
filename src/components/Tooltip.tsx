@@ -41,7 +41,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             <span style={{ borderColor: colorTheme }} />
             <span style={{ borderColor: colorTheme }} />
             <span style={{ borderColor: colorTheme }} />
-            <span className="fab" style={{ backgroundColor: '#161618', fill: colorTheme, borderColor: colorTheme }}>
+            <span className="fab" style={{ fill: colorTheme, borderColor: colorTheme }}>
               <svg viewBox={viewBox} height="1.1em">
                 <path d={iconPath} />
               </svg>

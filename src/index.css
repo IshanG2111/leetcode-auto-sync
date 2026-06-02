@@ -13,6 +13,7 @@
   --bg-card-solid: #121214;
   --bg-input: #121214;
   --bg-hover: rgba(255, 255, 255, 0.03);
+  --bg-social-btn: #161618 color:var(--accent-orange);
 
   /* Pipeline Inactive (Dark) */
   --bg-inactive: rgba(255, 255, 255, 0.02);
@@ -95,6 +96,7 @@
   --bg-card-solid: #eef2f5;
   --bg-input: #eef2f5;
   --bg-hover: rgba(0, 0, 0, 0.03);
+  --bg-social-btn: #ffffff color:var(--accent-cyan);
 
   /* Pipeline Inactive (Light) */
   --bg-inactive: rgba(0, 0, 0, 0.04);
@@ -1649,6 +1651,7 @@ header {
   border: 1px solid;
   border-radius: 8px;
   transition: all 0.3s;
+  background: var(--bg-social-btn);
 }
 
 .tooltip-container .icon:hover .layer span {
