@@ -1,4 +1,4 @@
-# ✦ Aergia Engine
+# Aergia Engine
 
 > A premium, intelligent developer automation pipeline. Aergia automatically monitors your solved LeetCode solutions, processes them through an intelligent pipeline, commits organized solutions to GitHub, and registers rich metadata inside Notion databases.
 
@@ -52,8 +52,8 @@ flowchart LR
 
 ## ✨ Key Capabilities
 
-### 🎨 Premium Translucent Interface (iOS 18 Grid Aesthetic)
-*   **Frosted Glassmorphism:** Custom components styled with light-refracting double-borders simulating native macOS/iOS window panels.
+### 🎨 Premium Neumorphic Interface (iOS 18 Grid Aesthetic)
+*   **Sleek Neumorphism:** Custom components styled with soft, extruded drop-shadows and inner inset shadows simulating tactile native interface panels.
 *   **Micro-Interactions:** Hover states trigger interactive scanning glows (`#FF9FFC`) and coordinate readouts.
 *   **Ambient Mesh Overlay:** A minimal mathematical vector grid is layered dynamically over the background.
 
@@ -130,7 +130,7 @@ npm run start
 │   │   ├── GridScan.jsx    # Three.js coordinate scanner
 │   │   └── Tooltip.tsx     # Context-aware helpers
 │   ├── App.tsx         # Core Dashboard Layout & Assistant
-│   └── index.css       # Glassmorphism theme definitions
+│   └── index.css       # Neumorphism theme definitions
 ├── server.ts           # Unified Vite + Express Server Entry
 ├── vercel.json         # Vercel Serverless Routing Schema
 └── package.json        # Dependencies & Automation Scripts
