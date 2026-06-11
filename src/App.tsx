@@ -100,6 +100,15 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'settings' | 'assistant' | 'about'>('dashboard');
   const [privacyModal, setPrivacyModal] = useState(false);
 
+  // Responsive state
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Settings
   const [leetcodeUsername, setLeetcodeUsername] = useState('');
   const [leetcodeSession, setLeetcodeSession] = useState('');
@@ -205,7 +214,7 @@ export default function App() {
       if (animGh) animGh.cancel();
       if (animNotion) animNotion.cancel();
     };
-  }, [isSyncing, leetcodeUsername, syncToGithub, githubRepo, syncToNotion, notionDbId]);
+  }, [isSyncing, leetcodeUsername, syncToGithub, githubRepo, syncToNotion, notionDbId, isMobile]);
 
   /* ─── Toast helper ─── */
   const showToast = useCallback((msg: string) => {
@@ -530,6 +539,10 @@ export default function App() {
     </div>
   );
 
+  const pathLcToCore = isMobile ? "M 50 15 L 50 50" : "M 16 50 L 50 50";
+  const pathCoreToGh = isMobile ? "M 50 50 C 50 67, 25 67, 25 85" : "M 50 50 C 67 50, 67 25, 84 25";
+  const pathCoreToNotion = isMobile ? "M 50 50 C 50 67, 75 67, 75 85" : "M 50 50 C 67 50, 67 75, 84 75";
+
   /* ════════════════ RENDER ════════════════ */
   return (
     <div className="min-h-screen antialiased transition-colors duration-500" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-1)', fontFamily: 'var(--font-sans)' }}>
@@ -740,18 +753,25 @@ export default function App() {
           >
             {/* ════════ Header ════════ */}
             <header className="sticky top-0 z-50 w-full glass-nav" style={{ paddingBottom: '12px', overflow: 'visible' }}>
-              <div className="max-w-[1120px] mx-auto px-5 py-3.5 flex items-center justify-between gap-4">
-                <div className="flex items-center">
+              <div className="max-w-[1120px] mx-auto px-5 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                {/* Logo and Mobile Theme Toggler Row */}
+                <div className="flex items-center justify-between w-full md:w-auto">
                   <h1 
                     className="font-orbitron font-extrabold text-[1.25rem] tracking-[0.25em] text-[#FF5A00] select-none leading-none pt-0.5"
                     style={{ textShadow: '0 0 20px rgba(255, 90, 0, 0.3), 0 0 40px rgba(255, 90, 0, 0.1)' }}
                   >
                     AERGIA
                   </h1>
+                  
+                  {/* Theme toggler shown on top row on mobile */}
+                  <div className="md:hidden">
+                    <AnimatedThemeToggler />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-4.5">
-                  <div className="seg-control">
+                {/* Segment Control Navigation & Theme Toggler */}
+                <div className="flex items-center gap-4.5 w-full md:w-auto">
+                  <div className="seg-control w-full md:w-auto justify-around md:justify-start">
                     {(['dashboard', 'settings', 'assistant', 'about'] as const).map(t => (
                       <button key={t} onClick={() => setActiveTab(t)} className={`seg-btn ${activeTab === t ? 'active' : ''}`}>
                         {t === 'dashboard' ? 'Dashboard' : t === 'settings' ? 'Settings' : t === 'assistant' ? 'Setup' : 'About'}
@@ -759,7 +779,11 @@ export default function App() {
                       </button>
                     ))}
                   </div>
-                  <AnimatedThemeToggler />
+                  
+                  {/* Theme toggler hidden on mobile, shown on desktop */}
+                  <div className="hidden md:block">
+                    <AnimatedThemeToggler />
+                  </div>
                 </div>
               </div>
             </header>
@@ -831,36 +855,36 @@ export default function App() {
 
                              {/* Track: LeetCode -> Aergia Core */}
                              <path 
-                               d="M 16 50 L 50 50" 
+                               d={pathLcToCore} 
                                className={`track-path ${leetcodeUsername ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
                              />
                              {isSyncing && leetcodeUsername && (
-                               <path d="M 16 50 L 50 50" className="flow-path" />
+                               <path d={pathLcToCore} className="flow-path" />
                              )}
 
                              {/* Track: Aergia Core -> GitHub */}
                              <path 
-                               d="M 50 50 C 67 50, 67 25, 84 25" 
+                               d={pathCoreToGh} 
                                className={`track-path ${syncToGithub && githubRepo ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
                              />
                              {isSyncing && syncToGithub && githubRepo && (
-                               <path d="M 50 50 C 67 50, 67 25, 84 25" className="flow-path flow-path-github" />
+                               <path d={pathCoreToGh} className="flow-path flow-path-github" />
                              )}
 
                              {/* Track: Aergia Core -> Notion */}
                              <path 
-                               d="M 50 50 C 67 50, 67 75, 84 75" 
+                               d={pathCoreToNotion} 
                                className={`track-path ${syncToNotion && notionDbId ? (isSyncing ? 'syncing' : 'active') : 'inactive'}`} 
                              />
                              {isSyncing && syncToNotion && notionDbId && (
-                               <path d="M 50 50 C 67 50, 67 75, 84 75" className="flow-path flow-path-notion" />
+                               <path d={pathCoreToNotion} className="flow-path flow-path-notion" />
                              )}
 
                              {/* Glowing Data Packets */}
                              {isSyncing && leetcodeUsername && (
                                <path 
                                  ref={lcToCorePacketRef}
-                                 d="M 16 50 L 50 50" 
+                                 d={pathLcToCore} 
                                  fill="none"
                                  stroke="#FF9F0A"
                                  strokeWidth="2.5"
@@ -871,7 +895,7 @@ export default function App() {
                              {isSyncing && syncToGithub && githubRepo && (
                                <path 
                                  ref={coreToGhPacketRef}
-                                 d="M 50 50 C 67 50, 67 25, 84 25" 
+                                 d={pathCoreToGh} 
                                  fill="none"
                                  stroke="#30D158"
                                  strokeWidth="2.5"
@@ -882,7 +906,7 @@ export default function App() {
                              {isSyncing && syncToNotion && notionDbId && (
                                <path 
                                  ref={coreToNotionPacketRef}
-                                 d="M 50 50 C 67 50, 67 75, 84 75" 
+                                 d={pathCoreToNotion} 
                                  fill="none"
                                  stroke="#5E5CE6"
                                  strokeWidth="2.5"

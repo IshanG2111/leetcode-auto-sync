@@ -1759,3 +1759,50 @@ header {
   border-top: 1px solid var(--border-glass);
   margin-top: 6px;
 }
+
+/* ─── Mobile UI Optimizations (max-width: 767px) ─── */
+@media (max-width: 767px) {
+  .glass {
+    padding: 1.25rem;
+    border-radius: var(--r-lg);
+  }
+  .glass-solid {
+    padding: 1.5rem;
+    border-radius: var(--r-lg);
+  }
+  .glass-subtle {
+    padding: 1rem;
+    border-radius: var(--r-md);
+  }
+  .seg-control {
+    display: flex;
+    width: 100%;
+  }
+  .seg-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  .pipe-node-container {
+    width: 155px;
+    height: 52px;
+  }
+  .pipe-node-lc {
+    left: 50% !important;
+    top: 15% !important;
+  }
+  .pipe-node-core {
+    left: 50% !important;
+    top: 50% !important;
+  }
+  .pipe-node-github {
+    left: 25% !important;
+    top: 85% !important;
+  }
+  .pipe-node-notion {
+    left: 75% !important;
+    top: 85% !important;
+  }
+}
+
