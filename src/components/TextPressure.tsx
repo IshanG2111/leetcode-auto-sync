@@ -42,8 +42,8 @@ const debounce = (func: (...args: any[]) => void, delay: number) => {
 
 const TextPressure: React.FC<TextPressureProps> = ({
   text = 'Compressa',
-  fontFamily = 'Compressa VF',
-  fontUrl = 'https://res.cloudinary.com/dr6lvwubh/raw/upload/v1529908256/CompressaPRO-GX.woff2',
+  fontFamily = 'Roboto Flex',
+  fontUrl = '',
   width = true,
   weight = true,
   italic = true,
@@ -175,11 +175,14 @@ const TextPressure: React.FC<TextPressureProps> = ({
   const styleElement = useMemo(() => {
     return (
       <style>{`
+        ${fontUrl ? `
         @font-face {
           font-family: '${fontFamily}';
-          src: url('${fontUrl}');
+          src: url('${fontUrl}') format('woff2');
           font-style: normal;
+          font-display: swap;
         }
+        ` : ''}
 
         .text-pressure-flex {
           display: flex;
@@ -225,7 +228,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
         ref={titleRef}
         className={`text-pressure-title ${dynamicClassName}`}
         style={{
-          fontFamily,
+          fontFamily: `"${fontFamily}", sans-serif`,
           textTransform: 'uppercase',
           fontSize: fontSize,
           lineHeight,

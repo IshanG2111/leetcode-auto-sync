@@ -734,8 +734,8 @@ export default function App() {
               <div className="w-full max-w-xl md:max-w-2xl h-[120px] md:h-[180px] flex items-center justify-center relative mb-6">
                 <TextPressure 
                   text="AERGIA"
-                  fontFamily="Compressa VF"
-                  fontUrl="https://res.cloudinary.com/dr6lvwubh/raw/upload/v1529908256/CompressaPRO-GX.woff2"
+                  fontFamily="Roboto Flex"
+                  fontUrl=""
                   width={true}
                   weight={true}
                   italic={true}
