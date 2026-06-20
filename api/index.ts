@@ -26,6 +26,77 @@ const fetchLeetCode = async (query: string, variables: any, sessionCookie?: stri
   return res.json();
 };
 
+// Helper to analyze solution code with Google Gemini API
+const analyzeCodeWithGemini = async (apiKey: string, title: string, lang: string, code: string) => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const prompt = `You are a professional software engineer. Analyze the following LeetCode solution for the problem "${title}" written in ${lang}.
+Code:
+${code}
+
+Provide the analysis in JSON format with these exact keys:
+- "approach": A concise, clear one-sentence summary of the algorithm/approach used (under 15 words).
+- "timeComplexity": The time complexity in Big O notation (e.g. "O(n)", "O(n log n)", "O(1)").
+- "spaceComplexity": The space complexity in Big O notation (e.g. "O(1)", "O(n)").
+
+Make sure it's valid JSON only. Do not include markdown tags.`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
+        responseMimeType: 'application/json'
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error('Empty response from Gemini');
+  }
+
+  let cleanText = text.trim();
+  if (cleanText.startsWith('```')) {
+    cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+  }
+
+  const parsed = JSON.parse(cleanText);
+  return {
+    approach: parsed.approach || '',
+    timeComplexity: parsed.timeComplexity || 'Unknown',
+    spaceComplexity: parsed.spaceComplexity || 'Unknown'
+  };
+};
+
+// Helper to format file header comment
+const formatCommentHeader = (title: string, url: string, difficulty: string, lang: string, analysis: { approach: string, timeComplexity: string, spaceComplexity: string }) => {
+  const commentChar = (lang === 'python3' || lang === 'python' || lang === 'ruby') ? '#' : '//';
+  let header = `${commentChar} Title: ${title}\n`;
+  header += `${commentChar} URL: ${url}\n`;
+  header += `${commentChar} Difficulty: ${difficulty}\n`;
+  header += `${commentChar} Language: ${lang}\n`;
+  if (analysis.approach) {
+    header += `${commentChar} Approach: ${analysis.approach}\n`;
+  }
+  if (analysis.timeComplexity) {
+    header += `${commentChar} Time Complexity: ${analysis.timeComplexity}\n`;
+  }
+  if (analysis.spaceComplexity) {
+    header += `${commentChar} Space Complexity: ${analysis.spaceComplexity}\n`;
+  }
+  header += '\n';
+  return header;
+};
+
 app.post('/api/sync', async (req, res) => {
   const {
     leetcodeUsername,
@@ -37,7 +108,9 @@ app.post('/api/sync', async (req, res) => {
     syncToNotion,
     syncToGithub,
     syncMode,
-    forceUpdate
+    forceUpdate,
+    geminiApiKey,
+    useGemini
   } = req.body;
 
   const logs: string[] = [];
@@ -245,6 +318,36 @@ app.post('/api/sync', async (req, res) => {
           log(`Failed to fetch details for ${sub.title}, proceeding with basic info.`);
       }
 
+      // Fetch solution code first
+      let rawCode = '';
+      try {
+         if (leetcodeSession && sub.id) {
+             const SUB_DETAILS_QUERY = `query submissionDetails($submissionId: Int!) {
+               submissionDetails(submissionId: $submissionId) { code }
+             }`;
+             log(`[LeetCode] Fetching code for submission ${sub.id}...`);
+             const codeData = await fetchLeetCode(SUB_DETAILS_QUERY, { submissionId: parseInt(sub.id) }, leetcodeSession);
+             if (codeData?.data?.submissionDetails?.code) {
+                 rawCode = codeData.data.submissionDetails.code;
+             }
+         }
+      } catch(e: any) {
+          log(`[LeetCode] Failed to fetch code for ${sub.title}: ${e.message}`);
+      }
+
+      // Gemini Analysis
+      let geminiAnalysis = { approach: '', timeComplexity: '', spaceComplexity: '' };
+      if (useGemini && (geminiApiKey || process.env.GEMINI_API_KEY)) {
+        try {
+          const key = geminiApiKey || process.env.GEMINI_API_KEY || '';
+          log(`[Gemini] Analyzing solution for ${sub.title}...`);
+          geminiAnalysis = await analyzeCodeWithGemini(key, sub.title, sub.lang || 'Unknown', rawCode || 'No code provided');
+          log(`[Gemini] Analysis complete: Time: ${geminiAnalysis.timeComplexity}, Space: ${geminiAnalysis.spaceComplexity}`);
+        } catch (e: any) {
+          log(`[Gemini] Analysis failed for ${sub.title}: ${e.message}`);
+        }
+      }
+
       if (notion) {
         let tags: any[] = [];
         let properties: any = {};
@@ -300,6 +403,21 @@ app.post('/api/sync', async (req, res) => {
               properties['Date Solved'] = { date: { start: dateIso } };
           }
 
+          // Populate Gemini fields if they exist in DB schema or retrieve failed
+          const hasApproach = notionDbSchema ? !!(notionDbSchema.properties?.['Approach']) : true;
+          const hasTimeComplexity = notionDbSchema ? !!(notionDbSchema.properties?.['Time Complexity']) : true;
+          const hasSpaceComplexity = notionDbSchema ? !!(notionDbSchema.properties?.['Space Complexity']) : true;
+
+          if (geminiAnalysis.approach && hasApproach) {
+              properties['Approach'] = { rich_text: [ { text: { content: geminiAnalysis.approach } } ] };
+          }
+          if (geminiAnalysis.timeComplexity && hasTimeComplexity) {
+              properties['Time Complexity'] = { rich_text: [ { text: { content: geminiAnalysis.timeComplexity } } ] };
+          }
+          if (geminiAnalysis.spaceComplexity && hasSpaceComplexity) {
+              properties['Space Complexity'] = { rich_text: [ { text: { content: geminiAnalysis.spaceComplexity } } ] };
+          }
+
           if (sub.existingPageId) {
              await notion.pages.update({ page_id: sub.existingPageId, properties });
              log(`[Notion] Successfully updated ${sub.title}`);
@@ -336,22 +454,15 @@ app.post('/api/sync', async (req, res) => {
            const filePath = `LeetCode/${details.difficulty || 'Unknown'}/${sub.titleSlug}.${ext}`;
            log(`[GitHub] Pushing ${filePath}...`);
            
-           let submissionCode = `// Title: ${sub.title}\n// URL: https://leetcode.com/problems/${sub.titleSlug}/\n// Difficulty: ${details.difficulty}\n// Language: ${sub.lang}\n\n// Add your solution here!`;
-           
-           try {
-              if (leetcodeSession && sub.id) {
-                  const SUB_DETAILS_QUERY = `query submissionDetails($submissionId: Int!) {
-                    submissionDetails(submissionId: $submissionId) { code }
-                  }`;
-                  log(`[LeetCode] Fetching code for submission ${sub.id}...`);
-                  const codeData = await fetchLeetCode(SUB_DETAILS_QUERY, { submissionId: parseInt(sub.id) }, leetcodeSession);
-                  if (codeData?.data?.submissionDetails?.code) {
-                      submissionCode = `// Title: ${sub.title}\n// URL: https://leetcode.com/problems/${sub.titleSlug}/\n// Difficulty: ${details.difficulty}\n// Language: ${sub.lang}\n\n${codeData.data.submissionDetails.code}`;
-                  }
-              }
-           } catch(e) {
-               log(`[LeetCode] Failed to fetch code for ${sub.title}, using template.`);
-           }
+           const commentHeader = formatCommentHeader(
+               sub.title, 
+               `https://leetcode.com/problems/${sub.titleSlug}/`, 
+               details.difficulty || 'Unknown', 
+               sub.lang || 'Unknown', 
+               geminiAnalysis
+           );
+           const commentChar = (sub.lang === 'python3' || sub.lang === 'python' || sub.lang === 'ruby') ? '#' : '//';
+           const submissionCode = rawCode ? (commentHeader + rawCode) : (commentHeader + `${commentChar} Add your solution here!`);
 
            try {
               let sha = undefined;
@@ -477,6 +588,31 @@ app.post('/api/test-github', async (req, res) => {
     res.json({ success: true, message: 'Successfully connected to GitHub repository!' });
   } catch (e: any) {
     res.status(400).json({ error: e.message || 'Failed to connect to GitHub repository.' });
+  }
+});
+
+app.post('/api/test-gemini', async (req, res) => {
+  const { geminiApiKey } = req.body;
+  if (!geminiApiKey) {
+    return res.status(400).json({ error: 'Missing Gemini API key.' });
+  }
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Respond with a simple JSON object: {"success": true}' }] }],
+        generationConfig: { responseMimeType: 'application/json' }
+      })
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || 'Failed to connect to Gemini API');
+    }
+    res.json({ success: true, message: 'Successfully connected to Gemini!' });
+  } catch (e: any) {
+    res.status(400).json({ error: e.message || 'Failed to connect to Gemini API.' });
   }
 });
 

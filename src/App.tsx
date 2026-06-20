@@ -4,7 +4,7 @@ import {
   Eye, EyeOff, RefreshCw, Send, Terminal, Download, Copy, Trash2,
   HelpCircle, Check, Lock, CircleDot, AlertTriangle, Cpu,
   Calendar, CheckCircle, ChevronDown, X, Zap, BookOpen,
-  Shield, ArrowRight, Bookmark, Clock, ExternalLink
+  Shield, ArrowRight, Bookmark, Clock, ExternalLink, Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { animate, createDrawable } from 'animejs';
@@ -91,6 +91,17 @@ const helpGuides: Record<string, { title: string; steps: string[] }> = {
       'Paste it into the field below.',
     ],
   },
+  'gemini-key': {
+    title: 'Obtaining a Google Gemini API Key',
+    steps: [
+      'Go to the Google AI Studio website (aistudio.google.com).',
+      'Sign in with your Google account.',
+      'Click the "Get API key" button in the sidebar or top menu.',
+      'Click "Create API key" and select a Google Cloud project.',
+      'Copy the generated API key (starts with AIzaSy).',
+      'Paste the key into the field below.',
+    ],
+  },
 };
 
 /* ════════════════════════════════════════════════════════════════ */
@@ -118,6 +129,8 @@ export default function App() {
   const [syncToGithub, setSyncToGithub] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [githubRepo, setGithubRepo] = useState('');
+  const [useGemini, setUseGemini] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState('');
 
   // Temp (assistant)
   const [tempLeetcodeUsername, setTempLeetcodeUsername] = useState('');
@@ -144,11 +157,14 @@ export default function App() {
   const [notionTestErr, setNotionTestErr] = useState('');
   const [githubTest, setGithubTest] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [githubTestErr, setGithubTestErr] = useState('');
+  const [geminiTest, setGeminiTest] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [geminiTestErr, setGeminiTestErr] = useState('');
 
   // UI
   const [showSession, setShowSession] = useState(false);
   const [showNToken, setShowNToken] = useState(false);
   const [showGToken, setShowGToken] = useState(false);
+  const [showGeminiToken, setShowGeminiToken] = useState(false);
   const [logFilter, setLogFilter] = useState<'all' | 'system' | 'leetcode' | 'notion' | 'github' | 'error'>('all');
   const [logSearch, setLogSearch] = useState('');
   const [copied, setCopied] = useState(false);
@@ -232,10 +248,13 @@ export default function App() {
     const sG = localStorage.getItem('syncToGithub') === 'true';
     const gT = localStorage.getItem('githubToken') || '';
     const gR = localStorage.getItem('githubRepo') || '';
+    const uG = localStorage.getItem('useGemini') === 'true';
+    const gK = localStorage.getItem('geminiApiKey') || '';
 
     setLeetcodeUsername(u); setLeetcodeSession(s);
     setSyncToNotion(sN); setNotionToken(nT); setNotionDbId(nD);
     setSyncToGithub(sG); setGithubToken(gT); setGithubRepo(gR);
+    setUseGemini(uG); setGeminiApiKey(gK);
 
     const saved = localStorage.getItem('recentSolves');
     if (saved) { try { setRecentSolves(JSON.parse(saved)); } catch {} }
@@ -266,6 +285,8 @@ export default function App() {
     localStorage.setItem('syncToGithub', syncToGithub.toString());
     localStorage.setItem('githubToken', githubToken);
     localStorage.setItem('githubRepo', githubRepo);
+    localStorage.setItem('useGemini', useGemini.toString());
+    localStorage.setItem('geminiApiKey', geminiApiKey);
     fetchStats(leetcodeUsername);
     showToast('Settings saved successfully');
     setTimeout(() => setActiveTab('dashboard'), 600);
@@ -277,6 +298,7 @@ export default function App() {
     setLeetcodeUsername(''); setLeetcodeSession('');
     setSyncToNotion(false); setNotionToken(''); setNotionDbId('');
     setSyncToGithub(false); setGithubToken(''); setGithubRepo('');
+    setUseGemini(false); setGeminiApiKey('');
     setLeetcodeStats(null); setRecentSolves([]);
     showToast('All settings cleared');
     setActiveTab('assistant');
@@ -301,6 +323,16 @@ export default function App() {
       if (r.ok && d.success) { setGithubTest('success'); showToast('GitHub connected!'); }
       else { setGithubTest('error'); setGithubTestErr(d.error || 'Auth failed'); }
     } catch (e: any) { setGithubTest('error'); setGithubTestErr(e.message || 'Timeout'); }
+  };
+
+  const testGemini = async () => {
+    setGeminiTest('testing'); setGeminiTestErr('');
+    try {
+      const r = await fetch('/api/test-gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ geminiApiKey }) });
+      const d = await r.json();
+      if (r.ok && d.success) { setGeminiTest('success'); showToast('Gemini connected!'); }
+      else { setGeminiTest('error'); setGeminiTestErr(d.error || 'Authentication failed'); }
+    } catch (e: any) { setGeminiTest('error'); setGeminiTestErr(e.message || 'Timeout'); }
   };
 
   const autoNotion = async () => {
@@ -355,7 +387,11 @@ export default function App() {
     try {
       const r = await fetch('/api/sync', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leetcodeUsername, leetcodeSession, notionToken, notionDbId, githubToken, githubRepo, syncToNotion, syncToGithub, syncMode: mode, forceUpdate })
+        body: JSON.stringify({
+          leetcodeUsername, leetcodeSession, notionToken, notionDbId,
+          githubToken, githubRepo, syncToNotion, syncToGithub,
+          syncMode: mode, forceUpdate, geminiApiKey, useGemini
+        })
       });
       const d = await r.json();
       if (!r.ok) setError(d.error || "Sync failed");
@@ -1201,6 +1237,20 @@ export default function App() {
                                   {syncToNotion && notionDbId ? 'Active' : 'Off'}
                                 </span>
                               </div>
+
+                              {/* Gemini connection */}
+                              <div className="flex items-center justify-between p-3 rounded-2xl" style={{ background: 'var(--bg-hover)', border: 'var(--border-neumorphic)' }}>
+                                <div className="flex items-center gap-3">
+                                  <div className="icon-box" style={{ background: 'rgba(0,163,255,0.08)', color: '#00A3FF', width: '32px', height: '32px' }}><Sparkles className="w-4 h-4" /></div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-bold">Gemini Analyzer</p>
+                                    <p className="text-xs font-mono truncate max-w-[120px]" style={{ color: 'var(--text-3)' }}>{geminiApiKey ? 'Key configured' : 'Not set'}</p>
+                                  </div>
+                                </div>
+                                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${useGemini && geminiApiKey ? 'text-[#00A3FF] bg-[#00A3FF]/5 border border-[#00A3FF]/10' : 'text-white/20 bg-white/5 border border-white/5'}`}>
+                                  {useGemini && geminiApiKey ? 'Active' : 'Off'}
+                                </span>
+                              </div>
                             </div>
                             <div className="pt-2.5 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                               <button onClick={() => setActiveTab('settings')} className="btn btn-ghost w-full py-2.5 text-xs">Configure Destinations</button>
@@ -1331,6 +1381,28 @@ export default function App() {
                               <button onClick={testGithub} disabled={githubTest === 'testing'} className="btn btn-tint w-full py-2.5 text-sm">{githubTest === 'testing' && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Verify Connection</button>
                               {githubTest === 'success' && <div className="p-3.5 rounded-2xl text-sm flex items-center gap-2" style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.12)', color: 'var(--accent-green)' }}><CheckCircle2 className="w-4 h-4" />Connected!</div>}
                               {githubTest === 'error' && <div className="p-3.5 rounded-2xl text-sm flex items-center gap-2" style={{ background: 'rgba(255,69,58,0.06)', border: '1px solid rgba(255,69,58,0.12)', color: 'var(--accent-red)' }}><XCircle className="w-4 h-4" />{githubTestErr}</div>}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+
+                      {/* Gemini Analyzer */}
+                      <motion.div variants={cardVariant} className="glass space-y-5">
+                        <div className="flex items-center justify-between pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          <div className="flex items-center gap-3">
+                            <div className="icon-box" style={{ background: 'rgba(0,163,255,0.08)', color: '#00A3FF' }}><Sparkles className="w-5 h-5" /></div>
+                            <h3 className="text-lg font-bold tracking-tight">Gemini AI Analyzer</h3>
+                          </div>
+                          <label className="toggle"><input type="checkbox" checked={useGemini} onChange={e => setUseGemini(e.target.checked)} /><span className="toggle-track" /></label>
+                        </div>
+                        <AnimatePresence>
+                          {useGemini && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25 }} className="space-y-5 overflow-hidden">
+                              <SecretField label="Gemini API Key" value={geminiApiKey} onChange={setGeminiApiKey} show={showGeminiToken} onToggle={() => setShowGeminiToken(!showGeminiToken)} placeholder="AIzaSy…" helpKey="gemini-key" />
+                              <p className="text-xs leading-relaxed -mt-2" style={{ color: 'var(--text-3)' }}>Used to automatically analyze code submissions to extract approach summaries, time complexity, and space complexity details.</p>
+                              <button onClick={testGemini} disabled={geminiTest === 'testing'} className="btn btn-tint w-full py-2.5 text-sm">{geminiTest === 'testing' && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Verify Connection</button>
+                              {geminiTest === 'success' && <div className="p-3.5 rounded-2xl text-sm flex items-center gap-2" style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.12)', color: 'var(--accent-green)' }}><CheckCircle2 className="w-4 h-4" />Connected!</div>}
+                              {geminiTest === 'error' && <div className="p-3.5 rounded-2xl text-sm flex items-center gap-2" style={{ background: 'rgba(255,69,58,0.06)', border: '1px solid rgba(255,69,58,0.12)', color: 'var(--accent-red)' }}><XCircle className="w-4 h-4" />{geminiTestErr}</div>}
                             </motion.div>
                           )}
                         </AnimatePresence>
