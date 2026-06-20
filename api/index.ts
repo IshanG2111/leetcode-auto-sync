@@ -320,19 +320,25 @@ app.post('/api/sync', async (req, res) => {
 
       // Fetch solution code first
       let rawCode = '';
-      try {
-         if (leetcodeSession && sub.id) {
-             const SUB_DETAILS_QUERY = `query submissionDetails($submissionId: Int!) {
-               submissionDetails(submissionId: $submissionId) { code }
-             }`;
-             log(`[LeetCode] Fetching code for submission ${sub.id}...`);
-             const codeData = await fetchLeetCode(SUB_DETAILS_QUERY, { submissionId: parseInt(sub.id) }, leetcodeSession);
-             if (codeData?.data?.submissionDetails?.code) {
-                 rawCode = codeData.data.submissionDetails.code;
-             }
+      if (!leetcodeSession) {
+         log(`[LeetCode] Skipping code fetch for ${sub.title}: LeetCode session cookie is missing.`);
+      } else {
+         try {
+            if (sub.id) {
+                const SUB_DETAILS_QUERY = `query submissionDetails($submissionId: Int!) {
+                  submissionDetails(submissionId: $submissionId) { code }
+                }`;
+                log(`[LeetCode] Fetching code for submission ${sub.id}...`);
+                const codeData = await fetchLeetCode(SUB_DETAILS_QUERY, { submissionId: parseInt(sub.id) }, leetcodeSession);
+                if (codeData?.data?.submissionDetails?.code) {
+                    rawCode = codeData.data.submissionDetails.code;
+                } else {
+                    log(`[LeetCode] Failed to fetch code for ${sub.title}: Empty response (session cookie may be invalid or expired).`);
+                }
+            }
+         } catch(e: any) {
+             log(`[LeetCode] Failed to fetch code for ${sub.title}: ${e.message}`);
          }
-      } catch(e: any) {
-          log(`[LeetCode] Failed to fetch code for ${sub.title}: ${e.message}`);
       }
 
       // Gemini Analysis
@@ -450,6 +456,10 @@ app.post('/api/sync', async (req, res) => {
       }
 
       if (octokit) {
+           if (!rawCode) {
+                log(`[GitHub] Skipping sync for ${sub.title}: Solution code is missing.`);
+                continue;
+           }
            const ext = sub.lang === 'python3' ? 'py' : sub.lang === 'java' ? 'java' : sub.lang === 'cpp' ? 'cpp' : sub.lang === 'javascript' ? 'js' : sub.lang === 'typescript'? 'ts' : sub.lang === 'c' ? 'c' : sub.lang === 'csharp' ? 'cs' : sub.lang === 'swift' ? 'swift' : sub.lang === 'golang' ? 'go' : sub.lang === 'ruby' ? 'rb' : sub.lang === 'scala' ? 'scala' : sub.lang === 'kotlin' ? 'kt' : sub.lang === 'rust' ? 'rs' : sub.lang === 'php' ? 'php' : 'txt';
            const filePath = `LeetCode/${details.difficulty || 'Unknown'}/${sub.titleSlug}.${ext}`;
            log(`[GitHub] Pushing ${filePath}...`);
@@ -461,8 +471,7 @@ app.post('/api/sync', async (req, res) => {
                sub.lang || 'Unknown', 
                geminiAnalysis
            );
-           const commentChar = (sub.lang === 'python3' || sub.lang === 'python' || sub.lang === 'ruby') ? '#' : '//';
-           const submissionCode = rawCode ? (commentHeader + rawCode) : (commentHeader + `${commentChar} Add your solution here!`);
+           const submissionCode = commentHeader + rawCode;
 
            try {
               let sha = undefined;

@@ -468,7 +468,7 @@ export default function App() {
         setTempSyncToGithub(true); botMsg("Enter your GitHub PAT (starts with ghp_):", undefined, 400); setStep('github_token');
       } else {
         setTempSyncToGithub(false);
-        botMsg("Almost done — add a LeetCode session cookie? (optional, needed for private profiles)", ['Enter cookie', 'Skip'], 400);
+        botMsg("Almost done — add a LeetCode session cookie? (Required to fetch code solutions from LeetCode, optional if Notion only)", ['Enter cookie', 'Skip'], 400);
         setStep('ask_cookie');
       }
     }
@@ -479,13 +479,13 @@ export default function App() {
       try {
         const r = await fetch('/api/test-github', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ githubToken: tempGithubToken, githubRepo: repo }) });
         const d = await r.json();
-        if (r.ok && d.success) { botMsg("GitHub connected! Add a session cookie?", ['Enter cookie', 'Skip'], 700); setStep('ask_cookie'); }
+        if (r.ok && d.success) { botMsg("GitHub connected! Add a session cookie? (Required to fetch and sync code solutions)", ['Enter cookie', 'Skip'], 700); setStep('ask_cookie'); }
         else { botMsg(`Failed: ${d.error || 'Invalid'}`, ['Re-enter GitHub', 'Skip GitHub'], 700); setStep('github_retry'); }
       } catch (e: any) { botMsg(`Failed: ${e.message}`, ['Re-enter GitHub', 'Skip GitHub'], 700); setStep('github_retry'); }
     }
     else if (step === 'github_retry') {
       if (text.toLowerCase().includes('re-enter')) { botMsg("GitHub PAT:", undefined, 400); setStep('github_token'); }
-      else { setTempSyncToGithub(false); botMsg("Add session cookie?", ['Enter cookie', 'Skip'], 400); setStep('ask_cookie'); }
+      else { setTempSyncToGithub(false); botMsg("Add session cookie? (Required to fetch and sync code solutions)", ['Enter cookie', 'Skip'], 400); setStep('ask_cookie'); }
     }
     else if (step === 'ask_cookie') {
       if (text.toLowerCase().includes('enter') || text.toLowerCase().includes('cookie')) { botMsg("Paste your LEETCODE_SESSION cookie:", undefined, 400); setStep('leetcode_cookie'); }
@@ -1333,7 +1333,7 @@ export default function App() {
                         </div>
                         <div><label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-2)' }}>Username</label><input type="text" className="input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="e.g. IshanG2111" /></div>
                         <SecretField label="Session Cookie" value={leetcodeSession} onChange={setLeetcodeSession} show={showSession} onToggle={() => setShowSession(!showSession)} placeholder="Paste LEETCODE_SESSION…" helpKey="leetcode-session" />
-                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>Optional — needed for historical submissions and private profiles.</p>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>Required to fetch/sync code solutions to GitHub. Optional only for syncing titles to Notion.</p>
                       </motion.div>
 
                       {/* Notion */}
